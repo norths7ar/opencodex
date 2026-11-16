@@ -15,14 +15,30 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from ruamel.yaml import YAML
-from ruamel.yaml.error import YAMLError
+from ruamel.yaml.emitter import RoundTripEmitter
+from ruamel.yaml.error import CommentMark, YAMLError
+from ruamel.yaml.tokens import CommentToken
 
-from . import clients
-from .locks import instance_lock
+from backend.platform.files import instance_lock
+
+from .files import ClientConfigError, atomic_write, read_text
 
 LEGACY_PATH = "llm-pi-ai.providers.opencodex"
 PROFILE_PATH = "[id=llm-pi-ai].config.providers.opencodex"
 LIMIT = 16 << 20
+
+
+class _BoundaryComment(CommentToken):
+    """A standalone comment reattached as leading trivia for a surviving item."""
+
+
+class _DshEmitter(RoundTripEmitter):
+    def write_comment(self, comment, pre=False):
+        if pre and isinstance(comment, _BoundaryComment):
+            # The emitter normalizes indentation. Use the current block's output
+            # indent, not the column of the original comment's discarded owner.
+            comment.start_mark.column = self.indent or 0
+        super().write_comment(comment, pre)
 
 
 def _digest(source):
@@ -66,7 +82,7 @@ def provider_block(rows, base_url):
             model["reasoningEfforts"] = efforts
         models.append(model)
     return {
-        "displayName": "OpenCodex",
+        "displayName": "OpenCodex Lite",
         "api": "openai-responses",
         "baseURL": base_url,
         "headers": {"Authorization": "Bearer ocx_data_dsh"},
@@ -98,7 +114,7 @@ def _parse(text, profile):
     return data
 
 
-def _container(data, profile, create=False):
+def _container(data, profile, create=False, *, path=None):
     if profile:
         matched = [row for row in data if row.get("id") == "llm-pi-ai"]
         if len(matched) > 1:
@@ -109,6 +125,8 @@ def _container(data, profile, create=False):
             data.append({"id": "llm-pi-ai", "config": {}})
             matched = [data[-1]]
         cursor = matched[0]
+        if path is not None:
+            path.append((data, next(i for i, row in enumerate(data) if row is cursor)))
         parts = ("config", "providers")
     else:
         cursor, parts = data, ("llm-pi-ai", "providers")
@@ -122,6 +140,8 @@ def _container(data, profile, create=False):
             if not create:
                 return None
             cursor[part] = {}
+        if path is not None:
+            path.append((cursor, part))
         cursor = cursor[part]
         if not isinstance(cursor, dict):
             raise DshError("DSH provider container is not a mapping.", "blocked-container")
@@ -135,12 +155,101 @@ def _fragment(data, profile):
     return copy.deepcopy(container.get("opencodex")) if container is not None else None
 
 
-def _render(data, original):
+def _owned_comment_tokens(node):
+    seen = set()
+    stack = [node]
+    while stack:
+        item = stack.pop()
+        if id(item) in seen:
+            continue
+        seen.add(id(item))
+        if isinstance(item, CommentToken):
+            yield item
+            continue
+        comments = getattr(item, "ca", None)
+        if comments is not None:
+            stack.extend((comments.comment, comments.end, *comments.items.values()))
+        if isinstance(item, dict):
+            stack.extend(item.values())
+        elif isinstance(item, (list, tuple)):
+            stack.extend(item)
+
+
+def _boundary_comments(container, source, *, remove):
+    """Recover standalone comments ruamel attached to the owned value at an outer indent."""
+    location = getattr(container, "lc", None)
+    if not source or location is None or "opencodex" not in (location.data or {}):
+        return []
+    key_line, key_column = location.key("opencodex")
+    lines = source.splitlines()
+    key_comments = container.ca.items.get("opencodex")
+    discarded = (key_comments or []) if remove else (key_comments or [])[2:]
+    boundary = {}
+    for token in _owned_comment_tokens([container["opencodex"], discarded]):
+        line_no = token.start_mark.line
+        for part in token.value.splitlines():
+            if not part.strip():
+                continue
+            # A token starts at its first '#', but may combine an inline comment and
+            # subsequent standalone comments. Read original lines for their true indent.
+            while line_no < len(lines) and not lines[line_no].strip():
+                line_no += 1
+            if line_no >= len(lines):
+                break
+            line = lines[line_no]
+            stripped = line.lstrip()
+            indent = len(line) - len(stripped)
+            if line_no != key_line and stripped.startswith("#") and indent <= key_column:
+                boundary[line_no] = _BoundaryComment(stripped + "\n", CommentMark(0))
+            line_no += 1
+    if key_comments and not remove:
+        key_comments[2:] = [None, None]
+    return [boundary[line] for line in sorted(boundary)]
+
+
+def _edit_fragment(data, profile, source, block):
+    path = []
+    container = _container(data, profile, block is not None, path=path)
+    if container is None:
+        return []
+    comments = _boundary_comments(container, source, remove=block is None)
+    if block is None:
+        container.pop("opencodex", None)
+        if hasattr(container, "ca"):
+            container.ca.items.pop("opencodex", None)
+    else:
+        container["opencodex"] = copy.deepcopy(block)
+    if not comments:
+        return []
+    for parent, key in reversed([*path, (container, "opencodex")]):
+        # Deletion removes the key from iteration, but ruamel retains its original
+        # location. Find the next surviving item at this level or an outer one.
+        if isinstance(parent, dict):
+            if key not in (parent.lc.data or {}):
+                continue
+            line = parent.lc.key(key)[0]
+            siblings = (
+                other
+                for other in parent
+                if other in parent.lc.data and parent.lc.key(other)[0] > line
+            )
+        else:
+            siblings = iter(range(key + 1, len(parent)))
+        for next_key in siblings:
+            slots = parent.ca.items.setdefault(next_key, [None, None, None, None])
+            slots[1] = comments + (slots[1] or [])
+            return []
+    return comments
+
+
+def _render(data, original, tail_comments=()):
     stream = io.StringIO()
-    _yaml().dump(data, stream)
-    rendered = stream.getvalue()
+    yaml = _yaml()
+    yaml.Emitter = _DshEmitter
+    yaml.dump(data, stream)
+    rendered = stream.getvalue() + "".join(token.value for token in tail_comments)
     if original and "\r\n" in original and original.count("\n") == original.count("\r\n"):
-        rendered = rendered.replace("\n", "\r\n")
+        rendered = rendered.replace("\r\n", "\n").replace("\n", "\r\n")
     return rendered
 
 
@@ -176,12 +285,37 @@ class DshIntegration:
             rows = await rows
         return provider_block(rows, self.base_url)
 
+    async def sync(self) -> dict:
+        """Refresh an owned provider fragment; never acquire ownership automatically."""
+        block = await self.block()
+        state, _, _, _, _, current, reason = self._inspect(block)
+        if not state.get("owned"):
+            return {"ok": True, "status": "skipped", "changed": False}
+        if current == "conflict":
+            return {
+                "ok": False,
+                "status": "needsAttention",
+                "changed": False,
+                "reason": reason,
+                "message": "DSH configuration changed outside Lite; review it before synchronizing.",
+            }
+        plan = self.preview("apply", block)
+        if not plan["canApply"]:
+            return {
+                "ok": False,
+                "status": "needsAttention",
+                "changed": False,
+                "reason": plan.get("refusalReason", "unsafe"),
+            }
+        result = self.mutate("apply", block, plan["fingerprint"])
+        return {**result, "status": "applied" if result["ok"] else "needsAttention"}
+
     def _state(self):
-        text = clients._read(self.state_path, 256 << 20, "DSH integration state")
+        text = read_text(self.state_path, 256 << 20, "DSH integration state")
         return json.loads(text) if text else {"operations": [], "owned": None}
 
     def _save(self, state):
-        clients._atomic_write(
+        atomic_write(
             self.state_path,
             json.dumps(state, ensure_ascii=False, indent=2),
             "DSH integration state",
@@ -198,14 +332,14 @@ class DshIntegration:
         return self.home / "settings.yaml", False
 
     def _read_target(self, path, profile):
-        source = clients._read(path, LIMIT, "DSH configuration")
+        source = read_text(path, LIMIT, "DSH configuration")
         return source, _parse(source, profile)
 
     def _recover(self, state):
         pending = state.get("pending")
         if not pending:
             return
-        source = clients._read(Path(pending["path"]), LIMIT, "DSH configuration")
+        source = read_text(Path(pending["path"]), LIMIT, "DSH configuration")
         if source == pending["after"]:
             state.update(pending["next"])
         elif source != pending["before"]:
@@ -255,7 +389,7 @@ class DshIntegration:
                 result["reason"] = reason
             if state.get("owned"):
                 result.update(lastOpId=state["owned"]["opId"], appliedAt=state["owned"]["at"])
-        except (DshError, clients.ClientConfigError) as exc:
+        except (DshError, ClientConfigError) as exc:
             result.update(
                 state="unsafe",
                 reason=getattr(exc, "reason", "not-regular-file"),
@@ -299,7 +433,7 @@ class DshIntegration:
                 raise DshError("DSH rollback snapshot is unavailable.", "snapshot_expired")
             path = Path(row["configPath"])
             profile = row.get("profile", path.name == "cordis.patch.yml")
-            source = clients._read(path, LIMIT, "DSH configuration")
+            source = read_text(path, LIMIT, "DSH configuration")
             status = "current" if owned else "absent"
             if _digest(source) != row.get("afterDigest", _digest(row.get("after"))):
                 foreign = "drift"
@@ -318,14 +452,12 @@ class DshIntegration:
                     refusal = "conflict"
             if operation == "disable":
                 if owned:
-                    container = _container(data, profile)
-                    if container is not None:
-                        container.pop("opencodex", None)
+                    comments = _edit_fragment(data, profile, source, None)
                     after_owned = None
-                after = _render(data, source) if owned else source
+                after = _render(data, source, comments) if owned else source
             else:
-                _container(data, profile, True)["opencodex"] = copy.deepcopy(block)
-                after = _render(data, source)
+                comments = _edit_fragment(data, profile, source, block)
+                after = _render(data, source, comments)
                 after_owned = {"path": str(path), "fragment": block}
         will_change = source != after or (operation == "overwrite" and not owned)
         fingerprint = hashlib.sha256(
@@ -368,7 +500,7 @@ class DshIntegration:
     def preview(self, operation, block, op_id=None, confirm_drift=False):
         try:
             return self._plan(operation, block, op_id, confirm_drift)[0]
-        except (DshError, clients.ClientConfigError) as exc:
+        except (DshError, ClientConfigError) as exc:
             reason = getattr(exc, "reason", "unsafe")
             plan = {
                 "version": 1,
@@ -449,7 +581,7 @@ class DshIntegration:
                 if after is None:
                     path.unlink(missing_ok=True)
                 else:
-                    clients._atomic_write(path, after, "DSH configuration")
+                    atomic_write(path, after, "DSH configuration")
                 self._save(next_state)
                 return {
                     "ok": True,

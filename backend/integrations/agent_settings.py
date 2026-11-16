@@ -5,7 +5,8 @@ import json
 
 import tomlkit
 
-from . import clients
+from . import codex_config
+from .files import ClientConfigError, atomic_write, read_text
 
 
 def _get(document, path):
@@ -32,7 +33,7 @@ def _put(document, path, state):
                 parent[part] = tomlkit.table()
                 parent[part]["enabled"] = enabled
             else:
-                raise clients.ClientConfigError(f"Codex {part} is not a settings table.")
+                raise ClientConfigError(f"Codex {part} is not a settings table.")
         chain.append((parent, part))
         parent = parent[part]
     if state["present"]:
@@ -68,18 +69,20 @@ def desired_settings(config):
 
 def sync_settings(home, directory, config=None, *, restore=False):
     path = home / "config.toml"
-    journal_path = clients._journal_path(home, directory).with_name("codex-agent-settings.json")
+    journal_path = codex_config.config_journal_path(home, directory).with_name(
+        "codex-agent-settings.json"
+    )
     desired = {} if restore else desired_settings(config)
-    with clients._write_lock(home):
-        source = clients._read(path, 1 << 20, "Codex config.toml")
-        raw = clients._read(journal_path, 4 << 20, "Codex agent settings journal")
+    with codex_config.write_lock(home):
+        source = read_text(path, 1 << 20, "Codex config.toml")
+        raw = read_text(journal_path, 4 << 20, "Codex agent settings journal")
         record = json.loads(raw) if raw else {"original": {}, "applied": {}, "before": source}
         if record.get("pending") and source == record["pending"]["source"]:
             record = record["pending"]["previous"]
         record.pop("pending", None)
         if not desired and not raw:
             return False
-        document = clients._parse(source)
+        document = codex_config.parse_document(source)
         current = document.unwrap()
         # A boolean feature must be represented as its effective enabled value
         # before taking per-field ownership; retain the complete original text too.
@@ -96,7 +99,7 @@ def sync_settings(home, directory, config=None, *, restore=False):
                     # edited native mode for re-enable; while on, leave it intact.
                     record["original"][key] = _get(current, key)
                     continue
-                raise clients.ClientConfigError(
+                raise ClientConfigError(
                     f"Codex {key} changed after Lite applied it; agent settings were left untouched."
                 )
         for key in desired:
@@ -112,7 +115,7 @@ def sync_settings(home, directory, config=None, *, restore=False):
                 key,
                 {"present": True, "value": value} if value is not None else {"present": False},
             )
-        candidate = clients._render(document.as_string(), source)
+        candidate = codex_config.render_document(document.as_string(), source)
         if not desired and source == record.get("after") and not record.get("externalEdit"):
             candidate = record["before"]
         if candidate != source:
@@ -122,14 +125,14 @@ def sync_settings(home, directory, config=None, *, restore=False):
             }
             record["after"] = candidate
             record["pending"] = {"source": source, "previous": previous}
-            clients._atomic_write(journal_path, json.dumps(record), "Codex agent settings journal")
-            clients._unchanged(path, source)
+            atomic_write(journal_path, json.dumps(record), "Codex agent settings journal")
+            codex_config.ensure_unchanged(path, source)
             if candidate is None:
                 path.unlink(missing_ok=True)
             else:
-                clients._atomic_write(path, candidate, "Codex config.toml")
+                atomic_write(path, candidate, "Codex config.toml")
             record.pop("pending", None)
-            clients._atomic_write(journal_path, json.dumps(record), "Codex agent settings journal")
+            atomic_write(journal_path, json.dumps(record), "Codex agent settings journal")
         if not desired:
             journal_path.unlink(missing_ok=True)
         return candidate != source

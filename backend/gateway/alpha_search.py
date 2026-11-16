@@ -7,17 +7,17 @@ import time
 from dataclasses import dataclass
 from uuid import uuid4
 
-import anyio
 import httpx
 
-from backend.auth.access import SubscriptionAuthorizationError
+from backend.auth.access import SubscriptionAuthorizationError, SubscriptionRefreshUnavailable
 from backend.policies.pacing import PacingDenied
 from backend.policies.workflow import WorkflowDenied
+from backend.requests import AttemptContext, AttemptReason, Outcome, TerminalStatus
 from backend.telemetry.pricing import pricing_family
 
 from .attempts import PhysicalAttempt
-from .context import AttemptContext, AttemptReason, Outcome, TerminalStatus
-from .transport import PreparedSend, until_cancelled
+from .delivery_sse import UpstreamBodyOverflow
+from .transport import PreparedSend, finish_cleanup, until_cancelled
 
 MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 TIMEOUT_SECONDS = 200
@@ -87,11 +87,18 @@ class AlphaSearchRelay:
         executor = dispatcher.executor
         telemetry = executor.telemetry
         started = time.monotonic()
-        row = await telemetry.begin_request(request)
+        row = None
         lease = None
         outcome = Outcome(status_code=500, terminal_status=TerminalStatus.FAILED)
         usage = None
+        attempt_id = None
         try:
+
+            async def begin():
+                nonlocal row
+                row = await telemetry.begin_request(request)
+
+            await finish_cleanup(begin())
             async with asyncio.timeout(TIMEOUT_SECONDS):
                 channel = next(
                     (
@@ -112,6 +119,8 @@ class AlphaSearchRelay:
                     credential = await until_cancelled(
                         executor.authentication.token(channel), request.cancellation
                     )
+                except SubscriptionRefreshUnavailable:
+                    raise
                 except SubscriptionAuthorizationError, ValueError:
                     outcome = Outcome(
                         status_code=401,
@@ -122,10 +131,18 @@ class AlphaSearchRelay:
                 payload = isolate_metadata(body, credential["installationId"])
                 model = payload.get("model") if isinstance(payload, dict) else None
                 if isinstance(model, str) and "/" in model:
-                    prefix, native = model.split("/", 1)
+                    prefix, _ = model.split("/", 1)
                     if prefix in {channel.id, channel.alias}:
-                        payload["model"] = native
-                        model = native
+                        try:
+                            model = dispatcher.route(model).model_id
+                        except ValueError:
+                            outcome = Outcome(
+                                status_code=400,
+                                terminal_status=TerminalStatus.FAILED,
+                                error_code="invalid_model",
+                            )
+                            return _error(400, "Invalid model selector.")
+                        payload["model"] = model
                 model = model if isinstance(model, str) else ""
                 lease = dispatcher.workflow.admit_http(incoming)
                 for index in range(2):
@@ -161,6 +178,7 @@ class AlphaSearchRelay:
                         reason=AttemptReason.AUTH_REFRESH if index else AttemptReason.INITIAL,
                         account_identity=credential["accountId"],
                     )
+                    attempt_id = attempt.attempt_id
                     physical = PhysicalAttempt(executor.transport, telemetry)
                     send = PreparedSend(
                         channel.endpoints.base_url.rstrip("/") + "/alpha/search",
@@ -175,6 +193,7 @@ class AlphaSearchRelay:
                     ):
                         if lease:
                             lease.reserve_send()
+                        # Native search counts as a send but does not report model-token usage.
                         async with physical.open(
                             send,
                             request,
@@ -188,14 +207,9 @@ class AlphaSearchRelay:
                                 raise RuntimeError("Search upstream was not opened.")
                             content = bytearray()
                             async for chunk in physical.chunks():
+                                if len(content) + len(chunk) > MAX_RESPONSE_BYTES:
+                                    raise UpstreamBodyOverflow()
                                 content.extend(chunk)
-                                if len(content) > MAX_RESPONSE_BYTES:
-                                    outcome = Outcome(
-                                        status_code=502,
-                                        terminal_status=TerminalStatus.FAILED,
-                                        error_code="body_overflow",
-                                    )
-                                    return _error(502, "Search response exceeded the size limit.")
                             if upstream.status_code == 401 and index == 0:
                                 continue
                             status = upstream.status_code
@@ -213,6 +227,17 @@ class AlphaSearchRelay:
                             result = SearchResponse(status, response_headers, bytes(content))
                     usage = physical.context.usage
                     return result
+        except UpstreamBodyOverflow as exc:
+            outcome = Outcome(
+                status_code=exc.status, terminal_status=TerminalStatus.FAILED, error_code=exc.code
+            )
+            return _error(exc.status, "Search response exceeded the size limit.")
+        except SubscriptionRefreshUnavailable as exc:
+            attempt_id = None
+            outcome = Outcome(
+                status_code=exc.status, terminal_status=TerminalStatus.FAILED, error_code=exc.code
+            )
+            return _error(exc.status, str(exc))
         except (PacingDenied, WorkflowDenied) as exc:
             outcome = Outcome(
                 status_code=429, terminal_status=TerminalStatus.FAILED, error_code=exc.code
@@ -238,15 +263,19 @@ class AlphaSearchRelay:
             )
             return _error(502, "Search upstream connection failed.")
         finally:
-            with anyio.CancelScope(shield=True):
+
+            async def finalize():
                 try:
                     await telemetry.end_request(
                         request,
                         row,
                         outcome,
+                        attempt_id=attempt_id,
                         usage=usage,
                         duration_ms=(time.monotonic() - started) * 1000,
                     )
                 finally:
                     if lease:
                         lease.release()
+
+            await finish_cleanup(finalize())

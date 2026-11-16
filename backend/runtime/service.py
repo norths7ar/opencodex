@@ -6,8 +6,11 @@ import sys
 import time
 from pathlib import Path
 
+from backend.platform.files import instance_lock
+
+from .process import start_background, stop, wait_supervisor_stopped
 from .scheduler import Startup
-from .state import DEFAULT_PORT, instance_lock, read_state, status
+from .state import DEFAULT_PORT, read_state, status
 
 
 def record_operation(directory, identity, action, state, error=None):
@@ -48,20 +51,6 @@ def launch_service_command(directory, port, action, identity):
         record_operation(directory, identity, action, "failed", str(exc))
 
 
-def wait_stopped_supervisor(directory):
-    deadline = time.monotonic() + 10
-    while True:
-        try:
-            with instance_lock(directory, "startup-supervisor.lock"):
-                return
-        except RuntimeError:
-            if time.monotonic() >= deadline:
-                raise RuntimeError(
-                    "Background supervision did not stop; inspect startup.log."
-                ) from None
-            time.sleep(0.1)
-
-
 def wait_serving(directory, port):
     deadline = time.monotonic() + 30
     while True:
@@ -79,9 +68,46 @@ def wait_serving(directory, port):
         time.sleep(0.1)
 
 
-def service_command(directory, port, action):
-    from .cli import stop
+def _operation(startup, registration, action):
+    if registration["conflict"]:
+        raise RuntimeError("A different task occupies the Lite service name.")
+    action = action or ("repair" if registration["installed"] else "install")
+    if action == "uninstall":
+        action = "remove"
+    if action not in {
+        "install",
+        "repair",
+        "start",
+        "stop",
+        "restart",
+        "enable",
+        "disable",
+        "remove",
+    }:
+        raise ValueError("Unknown service action.")
+    if action in {"start", "restart", "repair"} and not registration["installed"]:
+        raise ValueError("Service is not installed; run ocx service install.")
+    if action in {"start", "restart"} and not registration["enabled"]:
+        raise ValueError("Service is disabled; run ocx service enable.")
+    reload = registration["stale"] or startup.environment_changed()
+    return {
+        "action": action,
+        "reload": reload,
+        "detached": action in {"stop", "remove", "restart", "install"}
+        or (action == "repair" and reload and registration["enabled"]),
+    }
 
+
+def plan_operation(directory, port, action, *, startup=None):
+    """Resolve whether a service operation must outlive the serving HTTP process."""
+    manager = startup or Startup(directory, port or read_state(directory).get("port", DEFAULT_PORT))
+    registration = manager.registration()
+    if registration.get("port") and port is None and startup is None:
+        manager = Startup(directory, registration["port"])
+    return _operation(manager, registration, action)
+
+
+def service_command(directory, port, action):
     startup = Startup(directory, port or read_state(directory).get("port", DEFAULT_PORT))
     try:
         registered = startup.registration()
@@ -123,14 +149,8 @@ def service_command(directory, port, action):
         }
     with instance_lock(directory, "service-command.lock"):
         registration = startup.registration()
-        if registration["conflict"]:
-            raise RuntimeError("A different task occupies the Lite service name.")
-        action = action or ("repair" if registration["installed"] else "install")
-        if action in {"start", "restart", "repair"} and not registration["installed"]:
-            raise ValueError("Service is not installed; run ocx service install.")
-        if action in {"start", "restart"} and not registration["enabled"]:
-            raise ValueError("Service is disabled; run ocx service enable.")
-        needs_reload = registration["stale"] or startup.environment_changed()
+        operation = _operation(startup, registration, action)
+        action, needs_reload = operation["action"], operation["reload"]
         if action in {"install", "repair", "restart"}:
             startup.preflight()
         previous_runtime = status(directory)
@@ -139,16 +159,14 @@ def service_command(directory, port, action):
             name: (directory / name).read_bytes() if (directory / name).exists() else None
             for name in ("startup-task.xml", "startup-environment.bin", "startup-preference.json")
         }
-        if action in {"stop", "uninstall", "remove", "restart", "install"} or (
-            action == "repair" and needs_reload and registration["enabled"]
-        ):
+        if operation["detached"]:
             with instance_lock(directory, "control.lock"):
                 stop(directory)
-            wait_stopped_supervisor(directory)
+            wait_supervisor_stopped(directory)
             # The supervisor releases its file lock before Task Scheduler marks
             # its process idle. /run during that gap is ignored (IgnoreNew).
             startup.wait_idle()
-        if action in {"uninstall", "remove"}:
+        if action == "remove":
             return startup.action("remove")
         if action == "stop":
             return {"ok": True, "action": action, "health": startup.health()}
@@ -159,7 +177,7 @@ def service_command(directory, port, action):
                 raise RuntimeError(
                     "A gateway is already running on another port in this state directory."
                 )
-            startup._command(["/run", "/tn", startup.task_name])
+            startup.run_task()
             result = {"ok": True, "action": action}
             wait_serving(directory, startup.port)
         else:
@@ -175,11 +193,11 @@ def service_command(directory, port, action):
                 ):
                     raise
                 try:
-                    startup._save_preference(False)
+                    startup.save_preference(False)
                     startup.wait_idle()
                     with instance_lock(directory, "control.lock"):
                         stop(directory)
-                    wait_stopped_supervisor(directory)
+                    wait_supervisor_stopped(directory)
                     startup.restore_registration(registration, files)
                     if previous_runtime["state"] == "running":
                         if (
@@ -187,12 +205,10 @@ def service_command(directory, port, action):
                             and registration["enabled"]
                             and previously_supervised
                         ):
-                            startup._command(["/run", "/tn", startup.task_name])
+                            startup.run_task()
                             wait_serving(directory, registration["port"])
                         else:
-                            from .cli import start
-
-                            start(directory, previous_runtime["port"])
+                            start_background(directory, previous_runtime["port"])
                 except (RuntimeError, OSError, ValueError, subprocess.TimeoutExpired) as recovery:
                     raise RuntimeError(
                         f"Service update failed: {exc}. Recovery failed: {recovery}"

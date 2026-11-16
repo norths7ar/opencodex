@@ -2,21 +2,23 @@
 
 import asyncio
 from contextlib import AsyncExitStack, suppress
+from sys import exc_info
 from uuid import uuid4
 
-import anyio
 import httpx
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 
 from backend.api.request_body import RequestBodyError, read_json
-from backend.auth.access import SubscriptionAuthorizationError
+from backend.auth.access import SubscriptionAuthorizationError, SubscriptionRefreshUnavailable
 from backend.gateway.alpha_search import AlphaSearchRelay
-from backend.gateway.context import RequestContext, RequestPurpose
 from backend.gateway.delivery import InvalidUpstreamResponse
+from backend.gateway.delivery_sse import UpstreamBodyOverflow
+from backend.gateway.transport import finish_cleanup
 from backend.policies.pacing import PacingDenied
 from backend.policies.spend_ledger import SpendDenied
 from backend.policies.workflow import LOCAL_REFUSAL_HEADER, WorkflowDenied
+from backend.requests import RequestContext, RequestPurpose
 from backend.telemetry.capture import classify_client, conversation_id
 
 
@@ -61,17 +63,24 @@ class OwnedStream(StreamingResponse):
         self.cancellation = cancellation
 
     async def __call__(self, scope, receive, send):
+        async def send_to_client(message):
+            try:
+                await send(message)
+            except OSError:
+                self.cancellation.set()
+                raise asyncio.CancelledError from None
+
         try:
-            await self.stream_response(send)
+            await self.stream_response(send_to_client)
         except asyncio.CancelledError:
+            await finish_cleanup(self.stack.__aexit__(*exc_info()))
             if not self.cancellation.is_set():
                 raise
         except BaseException:
-            self.cancellation.set()
+            await finish_cleanup(self.stack.__aexit__(*exc_info()))
             raise
-        finally:
-            with anyio.CancelScope(shield=True):
-                await self.stack.aclose()
+        else:
+            await finish_cleanup(self.stack.aclose())
 
 
 def generation_router(dispatcher, catalog):
@@ -157,9 +166,9 @@ def generation_router(dispatcher, catalog):
             if cancellation.is_set():
                 return Response(status_code=499)
             raise
-        except SubscriptionAuthorizationError as exc:
-            return JSONResponse({"error": {"code": exc.code, "message": str(exc)}}, 401)
-        except InvalidUpstreamResponse as exc:
+        except (SubscriptionAuthorizationError, SubscriptionRefreshUnavailable) as exc:
+            return JSONResponse({"error": {"code": exc.code, "message": str(exc)}}, exc.status)
+        except (InvalidUpstreamResponse, UpstreamBodyOverflow) as exc:
             return JSONResponse({"error": {"code": exc.code, "message": str(exc)}}, 502)
         except PacingDenied as exc:
             return JSONResponse({"error": {"code": exc.code, "message": str(exc)}}, 429)
@@ -176,8 +185,7 @@ def generation_router(dispatcher, catalog):
                 {"error": {"message": str(exc), "type": "invalid_request_error"}}, 400
             )
         finally:
-            with anyio.CancelScope(shield=True):
-                await stack.aclose()
+            await finish_cleanup(stack.aclose())
 
     @router.post("/v1/alpha/search")
     async def native_search(request: Request):

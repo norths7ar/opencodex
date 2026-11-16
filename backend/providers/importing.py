@@ -207,10 +207,10 @@ class LegacyProviderImport:
                 or not isinstance(caps, dict)
             ):
                 raise ValueError("Model settings require review.")
-            cfg.models.disabled = list(
+            cfg.models.legacy_disabled = list(
                 dict.fromkeys(
                     [
-                        *cfg.models.disabled,
+                        *cfg.models.legacy_disabled,
                         *[
                             v
                             for v in disabled

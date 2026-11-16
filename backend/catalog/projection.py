@@ -1,4 +1,4 @@
-"""Project effective catalog identities and metadata for client integrations."""
+"""Public model rows shared by policy consumers and client-specific projections."""
 
 from backend.catalog import EffectiveModel
 

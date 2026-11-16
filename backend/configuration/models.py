@@ -1,5 +1,6 @@
 """Persistent, versioned configuration; separate from secrets and management DTOs."""
 
+import re
 from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
@@ -23,6 +24,17 @@ class Endpoints(Schema):
     responses: str | None = None
     messages: str | None = None
 
+    @field_validator("discovery", "chat", "responses", "messages")
+    @classmethod
+    def validate_suffix(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if not value.startswith("/") or any(ord(char) < 32 for char in value):
+            raise ValueError("Endpoint overrides must be base URL suffixes beginning with '/'.")
+        if urlsplit(value).fragment:
+            raise ValueError("Endpoint overrides cannot contain a fragment.")
+        return value
+
     @field_validator("base_url")
     @classmethod
     def validate_base(cls, value: str) -> str:
@@ -41,7 +53,7 @@ class Endpoints(Schema):
 
 
 class ModelMetadata(Schema):
-    contextWindow: int | None = None
+    contextWindow: int | None = Field(default=None, gt=0)
     inputModalities: list[str] | None = None
     outputModalities: list[str] | None = None
     apiCapabilities: dict[str, JsonValue] | None = None
@@ -50,9 +62,9 @@ class ModelMetadata(Schema):
     displayName: str | None = None
     parallelToolCalls: bool | None = None
     codexToolMode: str | None = None
-    maxInputTokens: int | None = None
-    maxOutputTokens: int | None = None
-    autoCompactTokenLimit: int | None = None
+    maxInputTokens: int | None = Field(default=None, gt=0)
+    maxOutputTokens: int | None = Field(default=None, gt=0)
+    autoCompactTokenLimit: int | None = Field(default=None, gt=0)
     supportsReasoningSummaries: bool | None = None
     supportsVerbosity: bool | None = None
     suppressSyntheticMax: bool | None = None
@@ -61,6 +73,22 @@ class ModelMetadata(Schema):
     supportsReasoningEffort: bool | None = None
     supportsThinkingToggle: bool | None = None
     defaultThinkingEnabled: bool | None = None
+
+    @field_validator("inputModalities", "outputModalities")
+    @classmethod
+    def validate_modalities(cls, value: list[str] | None) -> list[str] | None:
+        if value is not None and any(
+            kind not in {"text", "image", "audio", "video"} for kind in value
+        ):
+            raise ValueError("Unsupported model modality.")
+        return value
+
+    @field_validator("displayName")
+    @classmethod
+    def validate_display_name(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("Display name must be nonempty.")
+        return value
 
 
 class ChannelModelMetadata(Schema):
@@ -152,6 +180,22 @@ class ChannelModels(Schema):
     adapters: dict[str, Protocol] = Field(default_factory=dict)
     metadata: ChannelModelMetadata = Field(default_factory=ChannelModelMetadata)
 
+    @field_validator("aliases", "adapters")
+    @classmethod
+    def validate_model_keys(cls, value: dict[str, str]) -> dict[str, str]:
+        if any(not key.strip() for key in value):
+            raise ValueError("Model IDs must be nonblank.")
+        return value
+
+    @field_validator("aliases")
+    @classmethod
+    def validate_aliases(cls, value: dict[str, str]) -> dict[str, str]:
+        if any(not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", alias) for alias in value.values()):
+            raise ValueError("Invalid model alias.")
+        if len({alias.lower() for alias in value.values()}) != len(value):
+            raise ValueError("Model aliases must be unique.")
+        return value
+
 
 class OAuthBinding(Schema):
     service_id: ChannelId
@@ -195,6 +239,8 @@ class CustomModel(ModelMetadata):
 
 class GlobalModels(Schema):
     disabled: list[str] = Field(default_factory=list)
+    legacy_disabled: list[str] = Field(default_factory=list)
+    legacy_selector_collisions: dict[ChannelId, list[str]] = Field(default_factory=dict)
     custom: list[CustomModel] = Field(default_factory=list)
     default_aliases: bool = False
     discovery: dict[str, JsonValue] | None = None

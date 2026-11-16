@@ -6,7 +6,14 @@ from dataclasses import dataclass
 from backend.configuration.models import Channel, Configuration, ModelMetadata, Protocol
 
 from .directory import DirectorySnapshot
-from .identity import ModelAlias, ModelIdentity, effective_aliases
+from .identity import (
+    ModelAlias,
+    ModelIdentity,
+    colliding_slugs,
+    disabled_model_ids,
+    effective_aliases,
+    projected_selector,
+)
 from .metadata import ResolvedMetadata, resolve_metadata
 
 
@@ -22,10 +29,7 @@ class EffectiveModel:
     initial_selection_pending: bool
     custom_id: str | None
     context_cap: int | None
-
-    @property
-    def routed_selector(self) -> str:
-        return self.identity.routed_selector
+    routed_selector: str
 
     @property
     def visible(self) -> bool:
@@ -56,7 +60,6 @@ def effective_models(
     official_lookup: Callable[[Channel], dict[str, dict]] | None = None,
 ) -> tuple[EffectiveModel, ...]:
     """Build the effective view from cached data only; lookups must not refresh it."""
-    disabled = set(config.models.disabled)
     custom_by_channel = {}
     for custom in config.models.custom:
         custom_by_channel.setdefault(custom.provider, {})[custom.modelId] = custom
@@ -74,6 +77,8 @@ def effective_models(
             [*(upstream if channel.models.live else channel.models.static), *custom_models]
         )
         aliases = effective_aliases(config.models, channel, known)
+        collisions = colliding_slugs(config.models, channel, known)
+        disabled = disabled_model_ids(config.models, channel, known)
         selected = set(channel.models.selected)
         pending = (channel.models.metadata.initial_selection or {}).get("status") == "pending"
         cap = (config.models.context_caps or {}).get(channel.id)
@@ -101,13 +106,12 @@ def effective_models(
                     ),
                     alias=aliases.get(native_id),
                     selected=not selected or native_id in selected,
-                    disabled=channel.disabled
-                    or pending
-                    or (identity.namespaced_id in disabled or identity.routed_selector in disabled),
+                    disabled=channel.disabled or pending or native_id in disabled,
                     subscription=channel.auth_mode == "oauth",
                     initial_selection_pending=pending,
                     custom_id=custom.id if custom else None,
                     context_cap=cap,
+                    routed_selector=projected_selector(identity, collisions),
                 )
             )
     return tuple(result)

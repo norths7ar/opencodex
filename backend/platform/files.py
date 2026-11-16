@@ -1,4 +1,4 @@
-"""Cross-process integration write lock."""
+"""Windows cross-process file locks."""
 
 import msvcrt
 from contextlib import contextmanager

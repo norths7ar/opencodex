@@ -4,7 +4,7 @@ import asyncio
 import json
 import time
 
-from backend.integrations import clients
+from backend.catalog.identity import disabled_model_ids
 
 
 def thread_spawn(headers):
@@ -17,27 +17,11 @@ def thread_spawn(headers):
         return False
 
 
-def legacy_fallback(home, primary):
-    """Read old role model_fallback fields; new settings are kept in gateway config."""
-    found = []
-    for path in (home / "agents").glob("*.toml"):
-        try:
-            document = clients._parse(clients._read(path, 1 << 20, "Codex agent role"))
-        except clients.ClientConfigError:
-            continue
-        if document.get("model") != primary:
-            continue
-        chain = document.get("model_fallback", [])
-        if isinstance(chain, list) and all(isinstance(value, str) for value in chain):
-            found.extend(chain)
-    return found
-
-
 class SubagentFallback:
-    def __init__(self, config_loader, route, home):
+    def __init__(self, config_loader, route, fallback_models):
         self.config_loader = config_loader
         self.route = route
-        self.home = home
+        self.fallback_models = fallback_models
         self.quota_reader = None
         self.health = {}
         self.checked_at = 0
@@ -71,15 +55,16 @@ class SubagentFallback:
             self.account if provider.auth_mode == "oauth" else None,
         )
 
-    def note_failure(self, headers, model, status):
+    def note_failure(self, headers, provider, model, status):
         if not thread_spawn(headers) or status != 429:
             return
         now = time.monotonic()
         interval = self.config_loader().features.agents.subagent_model_fallback_poll_ms / 1000
-        try:
-            key = self._key(model)
-        except ValueError:
-            return
+        key = (
+            provider.id,
+            model.casefold(),
+            self.account if provider.auth_mode == "oauth" else None,
+        )
         self.health = {key: until for key, until in self.health.items() if until > now}
         self.health[key] = now + interval
 
@@ -89,8 +74,7 @@ class SubagentFallback:
             key = self._key(selector)
         except ValueError:
             return True
-        disabled = config.models.disabled
-        if selector in disabled or f"{provider.id}/{model}" in disabled:
+        if model in disabled_model_ids(config.models, provider, (model,)):
             return True
         if self.health.get(key, 0) > time.monotonic():
             return True
@@ -107,21 +91,29 @@ class SubagentFallback:
                     return True
         return False
 
-    async def select(self, body, headers):
+    async def select(self, body, headers, *, lookup_model=None, normalize=None):
         if not thread_spawn(headers):
             return None
         primary = body.get("model")
         if not isinstance(primary, str) or not primary:
             return None
         config = self.config_loader()
-        specific = config.features.agents.subagent_model_fallback_by_model.get(primary, [])
+        lookup = lookup_model if isinstance(lookup_model, str) and lookup_model else primary
+        specific = config.features.agents.subagent_model_fallback_by_model.get(
+            lookup, config.features.agents.subagent_model_fallback_by_model.get(primary, [])
+        )
         global_chain = config.features.agents.subagent_model_fallback
-        legacy = legacy_fallback(self.home, primary)
-        if not specific and not global_chain and not legacy:
+        client_chain = self.fallback_models(lookup)
+        if not specific and not global_chain and not client_chain:
             return None
         chain = []
         seen = set()
-        for model in [primary, *specific, *global_chain, *legacy]:
+        for model in [primary, *specific, *global_chain, *client_chain]:
+            if normalize is not None:
+                try:
+                    model = normalize(model)
+                except ValueError:
+                    continue
             if not isinstance(model, str) or not model.strip() or model.strip().casefold() in seen:
                 continue
             seen.add(model.strip().casefold())

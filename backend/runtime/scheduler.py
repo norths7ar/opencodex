@@ -9,12 +9,14 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import xml.etree.ElementTree as ET
-from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-from .state import PROJECT_ROOT, instance_lock, status
+from backend.platform.files import instance_lock
+
+from .state import PROJECT_ROOT, status
 
 TASK_NS = "http://schemas.microsoft.com/windows/2004/02/mit/task"
 ET.register_namespace("", TASK_NS)
@@ -64,6 +66,8 @@ class Startup:
         self.run = run
         self._sid = sid
         self._user = None
+        self._health_lock = threading.Lock()
+        self._health_registration: tuple[float, object, dict, str | None] | None = None
         digest = hashlib.sha256(str(self.directory).casefold().encode()).hexdigest()[:12]
         self.task_name = f"OpenCodex Lite {digest}"
         self.description = f"OpenCodex Lite background gateway: {self.directory}"
@@ -244,19 +248,46 @@ class Startup:
             "xml": result.stdout,
         }
 
-    def health(self) -> dict:
-        error = None
+    def health(self, *, cached: bool = False) -> dict:
         try:
             operation = json.loads(
                 (self.directory / "service-operation.json").read_text(encoding="utf-8")
             )
         except OSError, ValueError:
             operation = None
-        try:
-            registration = self.registration()
-        except (RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
-            registration = {"installed": False, "enabled": False, "stale": False, "conflict": False}
-            error = str(exc)
+        versions = []
+        for name in ("startup-preference.json", "startup-task.xml"):
+            try:
+                metadata = (self.directory / name).stat()
+                versions.append((metadata.st_mtime_ns, metadata.st_size))
+            except OSError:
+                versions.append(None)
+        cache_key = (operation, tuple(versions))
+        # Overview polling needs live process state, not a new scheduler process
+        # each time. Explicit diagnostics remain fresh; operations invalidate the
+        # overview cache through receipts and preference/registration file changes.
+        with self._health_lock:
+            previous = self._health_registration
+            if cached and previous and previous[1] == cache_key and time.monotonic() < previous[0]:
+                registration, error = previous[2], previous[3]
+            else:
+                error = None
+                try:
+                    registration = self.registration()
+                except (RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
+                    registration = {
+                        "installed": False,
+                        "enabled": False,
+                        "stale": False,
+                        "conflict": False,
+                    }
+                    error = str(exc)
+                self._health_registration = (
+                    time.monotonic() + (60 if error else 300),
+                    cache_key,
+                    registration,
+                    error,
+                )
         live = status(self.directory)
         service_port = registration.get("port") or self.port
         viable = (
@@ -326,20 +357,20 @@ class Startup:
                 enabled = not ((repair or action == "repair") and not current["enabled"])
                 if not enabled:
                     self._command(["/change", "/tn", self.task_name, "/disable"])
-                self._save_preference(enabled)
+                self.save_preference(enabled)
                 if enabled:
                     self._command(["/run", "/tn", self.task_name])
             elif action in {"enable", "disable"}:
                 if not current["installed"]:
                     raise ValueError("Automatic startup is not installed.")
                 self._command(["/change", "/tn", self.task_name, f"/{action}"])
-                self._save_preference(action == "enable")
+                self.save_preference(action == "enable")
                 if action == "enable":
                     self._command(["/run", "/tn", self.task_name])
             elif action == "remove":
                 if current["installed"]:
                     self._command(["/delete", "/tn", self.task_name, "/f"])
-                self._save_preference(False)
+                self.save_preference(False)
                 (self.directory / "startup-task.xml").unlink(missing_ok=True)
                 (self.directory / "startup-environment.bin").unlink(missing_ok=True)
             else:
@@ -404,27 +435,14 @@ class Startup:
                 return
         raise RuntimeError("Service task did not stop within 45 seconds.")
 
-    def _save_preference(self, enabled: bool):
+    def save_preference(self, enabled: bool):
         path = self.directory / "startup-preference.json"
         temporary = path.with_suffix(".json.tmp")
         temporary.write_text(json.dumps({"enabled": enabled}), encoding="utf-8")
         temporary.replace(path)
 
-    def resume_supervision(self):
-        """A manual start after Stop also restores previously enabled crash recovery."""
-        preference = self.directory / "startup-preference.json"
-        if not preference.exists() or not json.loads(preference.read_text(encoding="utf-8")).get(
-            "enabled"
-        ):
-            return
-        current = self.registration()
-        if (
-            current["installed"]
-            and current["enabled"]
-            and not current["stale"]
-            and not current["conflict"]
-        ):
-            self._command(["/run", "/tn", self.task_name])
+    def run_task(self):
+        self._command(["/run", "/tn", self.task_name])
 
     def saved_environment(self):
         from backend.auth.storage import protect
@@ -473,47 +491,3 @@ class Startup:
         temporary = path.with_suffix(".bin.tmp")
         temporary.write_bytes(protect(json.dumps(self.environment()).encode()))
         temporary.replace(path)
-
-
-def supervise(directory: Path, port: int):
-    """Scheduler child: adopt an existing instance, recover crashes, honor deliberate stop."""
-    from backend.auth.storage import protect
-
-    from .cli import start
-
-    directory.mkdir(parents=True, exist_ok=True)
-    with (
-        instance_lock(directory, "startup-supervisor.lock"),
-        (directory / "startup.log").open("a", encoding="utf-8", buffering=1) as log,
-        redirect_stdout(log),
-        redirect_stderr(log),
-    ):
-        print("Starting OpenCodex Lite background supervision.", flush=True)
-        environment_path = directory / "startup-environment.bin"
-        if environment_path.exists():
-            environment = json.loads(protect(environment_path.read_bytes(), decrypt=True))
-            os.environ.update(environment)
-        started = False
-        while True:
-            try:
-                preference = directory / "startup-preference.json"
-                if preference.exists() and not json.loads(
-                    preference.read_text(encoding="utf-8")
-                ).get("enabled", False):
-                    print("Automatic startup disabled; leaving the gateway running.", flush=True)
-                    return
-                # CLI restart holds this lock across stop and start. Never mistake its
-                # temporary stopped state for an intentional final shutdown.
-                with instance_lock(directory, "control.lock"):
-                    current = status(directory)
-                    if started and current["state"] == "stopped":
-                        print("Gateway stopped explicitly; ending supervision.", flush=True)
-                        return
-                    if current["state"] not in {"running", "unresponsive"}:
-                        start(directory, port)
-                        started = True
-                    elif current["state"] == "running":
-                        started = True
-            except (RuntimeError, OSError, ValueError) as exc:
-                print(f"Background startup: {exc}", flush=True)
-            time.sleep(5)

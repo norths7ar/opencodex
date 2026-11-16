@@ -10,8 +10,8 @@ import httpx
 from backend.configuration.models import Channel, Protocol
 from backend.protocols import response_to_chat
 from backend.providers import match_destination
+from backend.requests import RequestContext, RequestPurpose
 
-from .context import RequestContext, RequestPurpose
 from .delivery import InvalidUpstreamResponse
 from .preparation import WIRES
 
@@ -74,7 +74,7 @@ class CompletionProbe:
         error = None
         termination = "completed"
         try:
-            target = self.dispatcher.route(selector)
+            target = self.dispatcher.route_native(channel.id, model)
             if target.channel.id != channel.id:
                 raise ValueError("Probe target no longer matches the selected channel.")
             wire_model = target.model_id
@@ -90,7 +90,9 @@ class CompletionProbe:
                 purpose=RequestPurpose.PROBE,
             )
             async with asyncio.timeout(self.timeout):
-                async with self.dispatcher.execute(request, body, {}) as response:
+                async with self.dispatcher.execute(
+                    request, body, {}, resolved_route=target
+                ) as response:
                     if not 200 <= response.status < 300:
                         error = _status_error(response.status)
                         termination = "timeout" if response.status in {408, 504} else "failed"

@@ -6,6 +6,16 @@ import re
 from collections.abc import AsyncIterable, AsyncIterator, Iterator
 
 _NEWLINE = re.compile(r"\r\n|\r|\n")
+MAX_SSE_FRAME_CHARS = 4 * 1024 * 1024
+
+
+class UpstreamBodyOverflow(ValueError):
+    status = 502
+    code = "body_overflow"
+
+    def __init__(self, *, upstream_error_status: int | None = None):
+        super().__init__("Upstream response exceeded the size limit.")
+        self.upstream_error_status = upstream_error_status
 
 
 class SSELines:
@@ -13,6 +23,12 @@ class SSELines:
         self._decoder = codecs.getincrementaldecoder("utf-8-sig")("replace")
         self._pending: list[str] = []
         self._cr = False
+        self._frame_chars = 0
+
+    def _add(self, length: int) -> None:
+        self._frame_chars += length
+        if self._frame_chars > MAX_SSE_FRAME_CHARS:
+            raise UpstreamBodyOverflow()
 
     def feed(self, data: bytes, *, final: bool = False) -> Iterator[str]:
         chunk = ("\r" if self._cr else "") + self._decoder.decode(data, final=final)
@@ -21,11 +37,17 @@ class SSELines:
             chunk = chunk[:-1]
         start = 0
         for sep in _NEWLINE.finditer(chunk):
+            self._add(sep.start() - start)
             line = "".join([*self._pending, chunk[start : sep.start()]])
             self._pending.clear()
             start = sep.end()
+            if line:
+                self._add(1)
+            else:
+                self._frame_chars = 0
             yield line
         if start < len(chunk):
+            self._add(len(chunk) - start)
             self._pending.append(chunk[start:])
         if final and self._pending:
             yield "".join(self._pending)

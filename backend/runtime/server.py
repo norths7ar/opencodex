@@ -8,7 +8,9 @@ from pathlib import Path
 
 import uvicorn
 
-from .state import instance_lock, write_state
+from backend.platform.files import instance_lock
+
+from .state import write_state
 
 
 def serve(directory: Path, port: int, create_app=None) -> None:

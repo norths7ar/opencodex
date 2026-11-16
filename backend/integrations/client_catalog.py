@@ -9,7 +9,8 @@ import json
 import re
 from pathlib import Path
 
-from . import clients
+from . import codex_config
+from .files import ClientConfigError, atomic_write, read_text
 
 _TEMPLATE_DATA = json.loads(
     Path(__file__).with_name("codex_catalog_template.json").read_text(encoding="utf-8")
@@ -42,7 +43,7 @@ _NATIVE_ONLY = (
 
 
 def _native_template(home: Path) -> dict | None:
-    source = clients._read(home / "models_cache.json", 32 << 20, "Codex model cache")
+    source = read_text(home / "models_cache.json", 32 << 20, "Codex model cache")
     catalog = _cache(source)
     retained = catalog.get("opencodex_native_inheritance_template")
     rows = ([retained] if isinstance(retained, dict) else []) + catalog["models"]
@@ -136,7 +137,7 @@ def _reasoning(entry: dict, row: dict) -> None:
 
 
 def catalog_path(home: Path, directory: Path) -> Path:
-    return clients._journal_path(home, directory).with_name("codex-models.json")
+    return codex_config.config_journal_path(home, directory).with_name("codex-models.json")
 
 
 def catalog_entries(
@@ -151,7 +152,7 @@ def catalog_entries(
         slug = row.get("namespaced") or row.get("alias") or f"{row['provider']}/{row['id']}"
         identity = (row["provider"], row["id"])
         if slug in seen and seen[slug] != identity:
-            raise clients.ClientConfigError(
+            raise ClientConfigError(
                 f"Two models map to the same Codex selector: {slug}. Resolve the model ID collision before synchronizing."
             )
         if slug in seen:
@@ -288,17 +289,17 @@ def _cache(source: str | None) -> dict:
             raise TypeError()
         return value
     except ValueError, TypeError:
-        raise clients.ClientConfigError(
-            "Codex models_cache.json is not a valid model cache."
-        ) from None
+        raise ClientConfigError("Codex models_cache.json is not a valid model cache.") from None
 
 
 def _configured_catalog(home: Path, directory: Path) -> dict | None:
-    current = clients._inspect(home / "config.toml", clients._journal_path(home, directory))
+    current = codex_config.inspect_configuration(
+        home / "config.toml", codex_config.config_journal_path(home, directory)
+    )
     if current.conflict:
-        raise clients.ClientConfigError(current.conflict)
+        raise ClientConfigError(current.conflict)
     original = (
-        clients._parse(current.journal["original"])
+        codex_config.parse_document(current.journal["original"])
         if current.revision is not None
         else current.document
     )
@@ -306,17 +307,17 @@ def _configured_catalog(home: Path, directory: Path) -> dict | None:
     if configured is None:
         return None
     if not isinstance(configured, str) or not configured.strip():
-        raise clients.ClientConfigError("Codex model_catalog_json must name a catalog file.")
+        raise ClientConfigError("Codex model_catalog_json must name a catalog file.")
     source_path = Path(configured).expanduser()
     if not source_path.is_absolute():
         source_path = home / source_path
     if source_path.resolve() == catalog_path(home, directory).resolve():
-        raise clients.ClientConfigError(
+        raise ClientConfigError(
             "The original Codex catalog points to Lite's output; restore the source catalog first."
         )
-    source = clients._read(source_path, 32 << 20, "Configured Codex model catalog")
+    source = read_text(source_path, 32 << 20, "Configured Codex model catalog")
     if source is None:
-        raise clients.ClientConfigError(f"Configured Codex model catalog is missing: {source_path}")
+        raise ClientConfigError(f"Configured Codex model catalog is missing: {source_path}")
     try:
         value = json.loads(source.removeprefix("\ufeff"))
         if not isinstance(value, dict) or not isinstance(value.get("models"), list):
@@ -342,7 +343,7 @@ def _configured_catalog(home: Path, directory: Path) -> dict | None:
                 raise ValueError()
         return value
     except ValueError, TypeError, RecursionError:
-        raise clients.ClientConfigError(
+        raise ClientConfigError(
             f"Configured Codex model catalog is invalid: {source_path}"
         ) from None
 
@@ -357,7 +358,7 @@ def prepare_catalog(
     retained = copy.deepcopy(native_rows)
     selectors = {entry["slug"] for entry in retained}
     if selectors.intersection(entry["slug"] for entry in routed):
-        raise clients.ClientConfigError(
+        raise ClientConfigError(
             "A configured Codex catalog model owns a gateway selector. Change the gateway alias before applying."
         )
     projected = copy.deepcopy(source) if source is not None else {}
@@ -384,10 +385,10 @@ def write_catalog(
     path = catalog_path(home, directory)
     projected = prepared if prepared is not None else prepare_catalog(home, directory, rows)[0]
     candidate = json.dumps(projected, ensure_ascii=False, indent=2)
-    source = clients._read(path, 16 << 20, "Codex model catalog")
+    source = read_text(path, 16 << 20, "Codex model catalog")
     if source == candidate:
         return path, False
-    clients._atomic_write(path, candidate, "Codex model catalog")
+    atomic_write(path, candidate, "Codex model catalog")
     return path, True
 
 
@@ -403,7 +404,7 @@ def _retained(value: dict, record: dict | None) -> list[dict]:
         if row.get("opencodex_lite") is not True:
             retained.append(row)
         elif row not in known.get(row.get("slug"), []):
-            raise clients.ClientConfigError(
+            raise ClientConfigError(
                 "A Lite-managed Codex cache row was edited outside the gateway; restore was not applied."
             )
     return retained
@@ -414,40 +415,38 @@ def sync_cache(
 ) -> bool:
     path = home / "models_cache.json"
     journal_path = catalog_path(home, directory).with_name("codex-cache-recovery.json")
-    with clients._write_lock(home):
-        source = clients._read(path, 32 << 20, "Codex model cache")
+    with codex_config.write_lock(home):
+        source = read_text(path, 32 << 20, "Codex model cache")
         value = _cache(source)
-        journal_source = clients._read(journal_path, 64 << 20, "Codex cache recovery journal")
+        journal_source = read_text(journal_path, 64 << 20, "Codex cache recovery journal")
         record = json.loads(journal_source) if journal_source else {"original": source}
         entries = prepared if prepared is not None else prepare_catalog(home, directory, rows)[1]
         retained = _retained(value, record)
         foreign = {row.get("slug") for row in retained}
         if foreign.intersection(row["slug"] for row in entries):
-            raise clients.ClientConfigError("A foreign Codex cache row owns a selected model slug.")
+            raise ClientConfigError("A foreign Codex cache row owns a selected model slug.")
         value["models"] = retained + entries
         candidate = json.dumps(value, ensure_ascii=False, indent=2)
         if source == candidate:
             return False
         record["previous"] = source
         record["applied"] = candidate
-        clients._atomic_write(journal_path, json.dumps(record), "Codex cache recovery journal")
-        if clients._read(path, 32 << 20, "Codex model cache") != source:
-            raise clients.ClientConfigError(
-                "Codex model cache changed during synchronization; retry."
-            )
-        clients._atomic_write(path, candidate, "Codex model cache")
+        atomic_write(journal_path, json.dumps(record), "Codex cache recovery journal")
+        if read_text(path, 32 << 20, "Codex model cache") != source:
+            raise ClientConfigError("Codex model cache changed during synchronization; retry.")
+        atomic_write(path, candidate, "Codex model cache")
         return True
 
 
 def restore_cache(home: Path, directory: Path) -> bool:
     path = home / "models_cache.json"
     journal_path = catalog_path(home, directory).with_name("codex-cache-recovery.json")
-    with clients._write_lock(home):
-        journal_source = clients._read(journal_path, 64 << 20, "Codex cache recovery journal")
+    with codex_config.write_lock(home):
+        journal_source = read_text(journal_path, 64 << 20, "Codex cache recovery journal")
         if journal_source is None:
             return False
         record = json.loads(journal_source)
-        source = clients._read(path, 32 << 20, "Codex model cache")
+        source = read_text(path, 32 << 20, "Codex model cache")
         if source == record["applied"]:
             candidate = record["original"]
         elif source is None:
@@ -460,12 +459,12 @@ def restore_cache(home: Path, directory: Path) -> bool:
             else:
                 value["models"] = retained
                 candidate = json.dumps(value, ensure_ascii=False, indent=2)
-        if clients._read(path, 32 << 20, "Codex model cache") != source:
-            raise clients.ClientConfigError("Codex model cache changed during restoration; retry.")
+        if read_text(path, 32 << 20, "Codex model cache") != source:
+            raise ClientConfigError("Codex model cache changed during restoration; retry.")
         if candidate != source:
             if candidate is None:
                 path.unlink(missing_ok=True)
             else:
-                clients._atomic_write(path, candidate, "Codex model cache")
+                atomic_write(path, candidate, "Codex model cache")
         journal_path.unlink()
         return candidate != source

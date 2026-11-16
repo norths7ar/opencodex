@@ -20,8 +20,8 @@ from backend.policies.compaction import (
 )
 from backend.policies.fallback import FallbackTarget, prepare_retry, retry_headers
 from backend.protocols import sse
+from backend.requests import RequestContext, RequestPurpose
 
-from .context import RequestContext, RequestPurpose
 from .delivery import DeliveryState
 from .transport import until_cancelled
 
@@ -68,6 +68,7 @@ async def dispatch_compaction(
     save_response=None,
     logical_source=None,
     binding_lookup=None,
+    binding_route=None,
 ):
     """Yield None when inapplicable, otherwise a native or portable response.
 
@@ -85,15 +86,15 @@ async def dispatch_compaction(
     if not compact and not remote and override is None:
         yield None
         return
-    logical = route(logical_source or original.get("model"))
+    logical = logical_source or route(original.get("model"))
     logical_selector = f"{logical.channel.id}/{logical.model_id}"
     source = logical
     binding = binding_lookup(original.get("previous_response_id")) if binding_lookup else None
     if binding and binding[0] == logical_selector:
-        source = route(binding[1])
+        source = (binding_route or route)(binding[1])
         if override is None:
             body["model"] = binding[1]
-    target = route(body.get("model"))
+    target = source if override is None else route(body.get("model"))
     source_target = FallbackTarget(source.channel.id, source.model_id)
     target_target = FallbackTarget(target.channel.id, target.model_id)
     changed = source_target != target_target
@@ -106,12 +107,16 @@ async def dispatch_compaction(
             expanded = await until_cancelled(expand(body, source), request.cancellation)
             body = prepare_retry(body, source_target, target_target, expanded_body=expanded)
         child = child_context(request, body, "responses", RequestPurpose.COMPACTION)
-        async with execute(child, body, child_headers, borrowed_lease=borrowed_lease) as response:
+        async with execute(
+            child, body, child_headers, borrowed_lease=borrowed_lease, resolved_route=target
+        ) as response:
             yield response
         return
     if native_supported(source, target, compact):
         child = child_context(request, body, request.protocol, RequestPurpose.COMPACTION)
-        async with execute(child, body, headers, borrowed_lease=borrowed_lease) as response:
+        async with execute(
+            child, body, headers, borrowed_lease=borrowed_lease, resolved_route=target
+        ) as response:
             if not compact or response.status != 404:
                 yield response
                 return
@@ -147,7 +152,7 @@ async def dispatch_compaction(
     summary_body["store"] = False
     child = child_context(request, summary_body, "responses", RequestPurpose.COMPACTION)
     async with execute(
-        child, summary_body, child_headers, borrowed_lease=borrowed_lease
+        child, summary_body, child_headers, borrowed_lease=borrowed_lease, resolved_route=target
     ) as response:
         if response.status >= 400:
             yield response

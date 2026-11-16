@@ -10,9 +10,8 @@ from uuid import uuid4
 import httpx
 
 from backend.policies.effort import EFFORTS
+from backend.requests import RequestContext, RequestPurpose
 from backend.telemetry.pricing import _bundled_price, _user_rates, pricing_family
-
-from .context import RequestContext, RequestPurpose
 
 TIERS = ["fast", "standard", "frontier"]
 INTENTS = ["glance", "measured", "thorough", "exhaustive"]

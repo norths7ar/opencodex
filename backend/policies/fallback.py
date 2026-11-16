@@ -10,6 +10,8 @@ from threading import Lock
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from backend.catalog.identity import ModelIdentity
+
 from .compaction import decode_summary
 
 
@@ -120,6 +122,10 @@ class ReplayUnavailable(ValueError):
     """The selected backup cannot receive this request without losing provider state."""
 
 
+class TargetReplayUnavailable(ReplayUnavailable):
+    """Replay may still work on a backup in the original channel."""
+
+
 def upstream_error_code(content: bytes) -> str | None:
     """Read original refusal codes before telemetry deliberately coarsens them."""
     try:
@@ -161,11 +167,13 @@ def _portable_items(items, *, cross_provider: bool):
                     and (source.get("file_id") or source.get("type") == "file")
                 )
             ):
-                raise ReplayUnavailable("Uploaded files belong to the original provider.")
+                raise TargetReplayUnavailable("Uploaded files belong to the original provider.")
             if kind in {"thinking", "redacted_thinking"} and (
                 item.get("signature") or item.get("data")
             ):
-                raise ReplayUnavailable("Signed thinking cannot be replayed to another provider.")
+                raise TargetReplayUnavailable(
+                    "Signed thinking cannot be replayed to another provider."
+                )
         if kind == "reasoning":
             # Account/model-bound ciphertext is not portable; preserve any readable summary.
             if (
@@ -238,9 +246,17 @@ class SimpleFallback:
         source = FallbackTarget(provider, model)
         if not settings.enabled:
             return FallbackPlan(source, ())
-        selectors = settings.routes.get(requested) if requested else None
-        if selectors is None:
-            selectors = settings.routes.get(source.selector, [])
+        selectors = []
+        for key in (requested, ModelIdentity(provider, model).encoded_selector, source.selector):
+            if key not in settings.routes:
+                continue
+            try:
+                resolved_provider, resolved_model = self.route(key)
+            except ValueError, KeyError:
+                continue
+            if FallbackTarget(resolved_provider.id, resolved_model) == source:
+                selectors = settings.routes[key]
+                break
         selected = []
         skipped = []
         seen = {source}

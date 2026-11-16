@@ -5,6 +5,7 @@ import ctypes
 import hashlib
 import hmac
 import json
+import math
 import os
 import secrets
 from collections.abc import Mapping
@@ -59,12 +60,31 @@ class AccountStorage:
         self.path = directory / "chatgpt-account.json"
 
     def load(self):
-        if not self.path.exists():
-            return None
         try:
-            blob = json.loads(self.path.read_text(encoding="utf-8"))["protected"]
-            return json.loads(protect(base64.b64decode(blob), decrypt=True))
-        except (ValueError, KeyError, OSError, RuntimeError) as exc:
+            try:
+                raw = self.path.read_text(encoding="utf-8")
+            except FileNotFoundError:
+                return None
+            blob = json.loads(raw)["protected"]
+            credential = json.loads(protect(base64.b64decode(blob), decrypt=True))
+            if (
+                not isinstance(credential, dict)
+                or any(
+                    not isinstance(credential.get(field), str) or not credential[field].strip()
+                    for field in ("accountId", "access", "generation", "installationId")
+                )
+                or not isinstance(credential.get("refresh", ""), str)
+                or type(credential.get("needsReauth", False)) is not bool
+                or type(credential.get("expires")) not in {int, float}
+                or not math.isfinite(credential["expires"])
+                or not math.isfinite(credential["expires"] * 1000)
+            ):
+                raise ValueError("Invalid saved account fields.")
+            for field in ("email", "alias"):
+                if field in credential and not isinstance(credential[field], str):
+                    credential[field] = None
+            return credential
+        except (ValueError, KeyError, TypeError, OverflowError, OSError, RuntimeError) as exc:
             raise ValueError(
                 "The saved ChatGPT account could not be unlocked; sign in again."
             ) from exc

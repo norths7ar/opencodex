@@ -1,45 +1,42 @@
-"""Export phase-one management schemas without starting the gateway."""
+"""Export the management DTO definitions without starting the gateway."""
 
 import argparse
 import json
 from pathlib import Path
 
-from pydantic import TypeAdapter
-
-from .contracts import (
+from backend.application.contracts import (
     ApiError,
-    ApplyResult,
+    ChannelConfigurationEdit,
+    ChannelConfigurationSaved,
+    ChannelDefaultSaved,
     ChannelDetail,
-    ChannelView,
-    ClientState,
+    ChannelList,
+    ChannelSaved,
     DiscoveryState,
-    ManagementEvent,
     ModelOverrideUpdate,
-    ModelSelection,
-    RefreshCatalog,
     SaveChannel,
-    ServiceState,
 )
+from backend.application.runtime_contracts import Overview, StartupHealth
 
 
 def management_schemas() -> dict:
     contracts = (
         ApiError,
-        ApplyResult,
         ChannelDetail,
-        ChannelView,
-        ClientState,
+        ChannelList,
+        ChannelConfigurationEdit,
+        ChannelConfigurationSaved,
+        ChannelDefaultSaved,
+        ChannelSaved,
         DiscoveryState,
         ModelOverrideUpdate,
-        ModelSelection,
-        RefreshCatalog,
         SaveChannel,
-        ServiceState,
+        Overview,
+        StartupHealth,
     )
     return {
         "version": 2,
         "contracts": {model.__name__: model.model_json_schema() for model in contracts},
-        "events": TypeAdapter(ManagementEvent).json_schema(),
     }
 
 

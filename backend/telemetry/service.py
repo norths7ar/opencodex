@@ -1,11 +1,15 @@
 """Logical request and physical send telemetry orchestration."""
 
+import asyncio
+import logging
 import re
+import sqlite3
 from contextlib import suppress
+from dataclasses import dataclass
 
 import anyio
 
-from backend.gateway.context import AttemptContext, Outcome, RequestContext, Usage
+from backend.requests import AttemptContext, Outcome, RequestContext, RequestPurpose, Usage
 
 from .debug import DebugState
 from .ledger import UsageStore, normalize_usage
@@ -29,13 +33,27 @@ _FALLBACK_TRIGGERS = {
 }
 
 
+@dataclass(frozen=True, slots=True)
+class SendFacts:
+    """Facts measured by the physical send, independent of durable logging."""
+
+    close_reason: str | None
+    settled: bool
+    received_headers: bool
+    semantic_output: bool
+    output_started: bool
+
+
 class Telemetry:
-    def __init__(self, store: UsageStore, *, debug: DebugState | None = None):
+    def __init__(self, store: UsageStore, *, debug: DebugState | None = None, on_success=None):
         self.store = store
         self.debug = debug
+        self.on_success = on_success
         self._requests: dict[str, int | None] = {}
         self._borrowed: set[str] = set()
         self._owners: dict[str, str] = {}
+        self._sends: dict[str, dict[str, SendFacts | None]] = {}
+        self._direct_sends: dict[str, list[str]] = {}
 
     def _provider_event(self, event: str, **fields) -> None:
         if self.debug is not None:
@@ -43,6 +61,10 @@ class Telemetry:
                 self.debug.event("provider", event, **fields)
 
     def attempt_started(self, attempt: AttemptContext) -> None:
+        owner = self._owners.get(attempt.request_id)
+        if owner is not None:
+            self._sends[owner][attempt.attempt_id] = None
+            self._direct_sends[attempt.request_id].append(attempt.attempt_id)
         self._provider_event(
             "route",
             provider=attempt.channel_id,
@@ -50,6 +72,14 @@ class Telemetry:
             protocol=attempt.protocol,
             reason=attempt.reason.value,
         )
+
+    def attempt_finished(self, attempt: AttemptContext, facts: SendFacts) -> None:
+        owner = self._owners.get(attempt.request_id)
+        if owner is not None:
+            self._sends[owner][attempt.attempt_id] = facts
+
+    def send_count(self, request: RequestContext) -> int:
+        return len(self._sends.get(self._owners.get(request.request_id), ()))
 
     def upstream_status(self, attempt: AttemptContext, status: int) -> None:
         self._provider_event(
@@ -99,6 +129,7 @@ class Telemetry:
             self._requests[request.request_id] = row
             self._borrowed.add(request.request_id)
             self._owners[request.request_id] = self._owners[request.parent_request_id]
+            self._direct_sends[request.request_id] = []
             return row
         row = await self.store.begin(
             method="POST",
@@ -113,15 +144,62 @@ class Telemetry:
         )
         self._requests[request.request_id] = row
         self._owners[request.request_id] = request.request_id
+        self._sends[request.request_id] = {}
+        self._direct_sends[request.request_id] = []
         return row
 
-    async def end_request(self, request: RequestContext, row, outcome, **kwargs):
+    async def end_request(
+        self, request: RequestContext, row, outcome, *, attempt_id: str | None = None, **kwargs
+    ):
         self._requests.pop(request.request_id, None)
         self._owners.pop(request.request_id, None)
+        direct = self._direct_sends.pop(request.request_id, ())
         if request.request_id in self._borrowed:
             self._borrowed.remove(request.request_id)
             return
-        await self.finalize_request(row, outcome, **kwargs)
+        sends = self._sends.pop(request.request_id, {})
+        if (
+            attempt_id is None
+            and direct
+            and outcome.error_code
+            in {
+                "upstream_timeout",
+                "upstream_connect_timeout",
+                "upstream_connect_error",
+                "upstream_transport_error",
+                "upstream_interrupted",
+                "invalid_upstream_response",
+                "body_overflow",
+            }
+        ):
+            attempt_id = direct[-1]
+        facts = sends.get(attempt_id)
+        successful_generation = (
+            request.parent_request_id is None
+            and request.purpose == RequestPurpose.GENERATION
+            and request.protocol in {"responses", "chat/completions", "messages"}
+            and outcome.status_code is not None
+            and 200 <= outcome.status_code < 300
+            and not outcome.cancelled
+            and not outcome.interrupted
+            and outcome.terminal_status not in {"failed", "cancelled"}
+        )
+        await self.finalize_request(
+            row,
+            outcome,
+            facts=facts,
+            send_count=len(sends),
+            settled_sends=sum(item is not None and item.settled for item in sends.values()),
+            successful_generation=successful_generation,
+            **kwargs,
+        )
+        if successful_generation and self.on_success is not None:
+            try:
+                await anyio.to_thread.run_sync(self.on_success)
+            except OSError, sqlite3.Error:
+                logging.getLogger(__name__).exception(
+                    "Could not persist the first successful request"
+                )
 
     async def begin_attempt(
         self,
@@ -158,12 +236,11 @@ class Telemetry:
                 "upstream_wire": attempt.protocol,
                 "parent_request_id": request.parent_request_id,
                 "child_request_id": request.request_id if request.parent_request_id else None,
-                "sent_upstream": True,
             },
         )
 
     async def finalize_attempt(
-        self, send_id: int | None, attempt: AttemptContext, *, close_reason: str | None = None
+        self, send_id: int | None, attempt: AttemptContext, *, facts: SendFacts | None = None
     ) -> None:
         outcome, usage = attempt.outcome, attempt.usage
         counters = normalize_usage(usage.values if usage else None)
@@ -184,7 +261,7 @@ class Telemetry:
             if outcome and outcome.terminal_status
             else None,
             "duration_ms": attempt.elapsed_ms,
-            "close_reason": close_reason,
+            "close_reason": facts.close_reason if facts else None,
         }
         await self.store.finalize_send(
             send_id,
@@ -192,6 +269,11 @@ class Telemetry:
             {
                 "served_model": attempt.served_model,
                 "response_service_tier": attempt.response_service_tier,
+                "sent_upstream": facts is not None,
+                "response_headers_received": facts.received_headers if facts else None,
+                "settled_sends": int(facts.settled) if facts else None,
+                "output_started": facts.output_started if facts else None,
+                "semantic_output": facts.semantic_output if facts else None,
             },
         )
 
@@ -202,9 +284,14 @@ class Telemetry:
         *,
         usage: Usage | None = None,
         duration_ms: float | None = None,
-        close_reason: str | None = None,
+        facts: SendFacts | None = None,
+        send_count: int = 0,
+        settled_sends: int = 0,
+        successful_generation: bool | None = None,
     ) -> None:
-        sends = list(self.store.attempts(request_row_id)) if request_row_id is not None else []
+        if request_row_id is None:
+            return
+        sends = await asyncio.to_thread(lambda: list(self.store.attempts(request_row_id)))
         await self.store.finalize(
             request_row_id,
             status=outcome.status_code if outcome.status_code is not None else 502,
@@ -214,8 +301,16 @@ class Telemetry:
             cancelled=outcome.cancelled,
             terminal_status=outcome.terminal_status.value if outcome.terminal_status else None,
             duration_ms=duration_ms,
-            close_reason=close_reason,
-            send_count=len(sends),
-            settled_sends=len(sends),
+            close_reason="client_cancel"
+            if outcome.cancelled
+            else facts.close_reason
+            if facts
+            else None,
+            response_headers_received=facts.received_headers if facts else None,
+            semantic_output=facts.semantic_output if facts else None,
+            output_started=facts.output_started if facts else None,
+            send_count=send_count,
+            settled_sends=settled_sends,
             fallback_attempts=sends,
+            successful_generation=successful_generation,
         )

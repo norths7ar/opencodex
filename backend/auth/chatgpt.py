@@ -14,7 +14,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 import httpx
 
 from .storage import AccountStorage
-from .tokens import TokenError, credentials, token_error
+from .tokens import InvalidTokenResponse, TokenError, credentials, token_error
 
 CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann"
 AUTH_ROOT = "https://auth.openai.com"
@@ -94,6 +94,7 @@ class ChatGPTAuth:
             "done": flow.get("status") == "done",
             "email": account.get("email") if account else None,
             "needsReauth": bool(account and account["needsReauth"]),
+            "credentialUnavailable": error is not None,
             "accounts": [account] if account else [],
             "activeAccountId": account["id"] if account else None,
             **({"hint": flow["hint"]} if pending and flow.get("hint") else {}),
@@ -110,7 +111,7 @@ class ChatGPTAuth:
                 raise TypeError()
             return payload
         except (ValueError, TypeError) as exc:
-            raise ValueError("ChatGPT returned an invalid token response.") from exc
+            raise InvalidTokenResponse("ChatGPT returned an invalid token response.") from exc
 
     async def token(self, *, rejected_access=None, expected_account_id=None):
         async with self.lock:

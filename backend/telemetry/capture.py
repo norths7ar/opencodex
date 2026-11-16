@@ -82,7 +82,7 @@ def conversation_id(headers, body, protocol):
 
 
 class UsageCapture:
-    def __init__(self):
+    def __init__(self, *, buffered_limit=4 * 1024 * 1024):
         self.started = time.monotonic()
         self.first_output_ms = None
         self.generation_start_ms = None
@@ -101,6 +101,7 @@ class UsageCapture:
         self._decoder = codecs.getincrementaldecoder("utf-8")("replace")
         self._buffer = ""
         self._overflow = False
+        self._buffered_limit = buffered_limit
 
     def output(self):
         self.last_output_ms = round((time.monotonic() - self.started) * 1000)
@@ -229,7 +230,8 @@ class UsageCapture:
             while "\n\n" in self._buffer:
                 frame, self._buffer = self._buffer.split("\n\n", 1)
                 self.frame(frame)
-        if len(self._buffer) > 4 * 1024 * 1024:
+        limit = 4 * 1024 * 1024 if self.streaming else self._buffered_limit
+        if len(self._buffer) > limit:
             self._buffer = ""
             self._overflow = True
 

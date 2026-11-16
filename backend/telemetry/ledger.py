@@ -31,6 +31,7 @@ SURFACES = {"codex", "claude", "claude-desktop", "grok", "other"}
 _META = {
     "request_id",
     "purpose",
+    "successful_generation",
     "provider",
     "model",
     "upstream_model",
@@ -55,6 +56,11 @@ _META = {
     "gen_start_ms",
     "last_output_ms",
     "sent_upstream",
+    "response_headers_received",
+    "output_started",
+    "semantic_output",
+    "close_reason",
+    "terminal_status",
     "send_count",
     "settled_sends",
     "auth_mode",
@@ -123,7 +129,14 @@ def _metadata(values: dict) -> dict:
                     attempt["error_code"] = error
                 attempts.append(attempt)
             value = attempts
-        elif key in {"streaming", "sent_upstream"}:
+        elif key in {
+            "streaming",
+            "sent_upstream",
+            "successful_generation",
+            "response_headers_received",
+            "output_started",
+            "semantic_output",
+        }:
             value = value if type(value) is bool else None
         elif key in {"first_token_ms", "gen_start_ms", "last_output_ms"}:
             value = (
@@ -309,6 +322,23 @@ class UsageStore:
             LOG.exception("Could not record gateway request metadata")
             return None
 
+    def first_success_at(self) -> int | None:
+        """Find an existing successful user generation when initializing product milestones."""
+        # Older Messages records also include count_tokens, so cannot prove generation.
+        # New records persist the same success decision used by the live milestone.
+        with self._connection() as conn:
+            row = conn.execute(
+                """SELECT MIN(timestamp) FROM requests
+                WHERE json_extract(metadata, '$.successful_generation') = 1
+                   OR (json_type(metadata, '$.successful_generation') IS NULL
+                       AND json_extract(result, '$.status') BETWEEN 200 AND 299
+                       AND json_extract(result, '$.terminal_status') = 'completed'
+                       AND json_extract(metadata, '$.purpose') = 'generation'
+                       AND json_extract(metadata, '$.inbound_protocol') IN ('chat', 'responses'))
+                """
+            ).fetchone()
+            return row[0]
+
     async def begin(self, *, method: str, path: str, **values) -> int | None:
         # Path is a registered protocol endpoint, never a raw URL or query string.
         inbound = {
@@ -390,7 +420,14 @@ class UsageStore:
             else None,
             "close_reason": close_reason
             if close_reason
-            in {"terminal", "client_cancel", "non_stream", "body_stall", "body_overflow"}
+            in {
+                "terminal",
+                "client_cancel",
+                "non_stream",
+                "body_stall",
+                "body_overflow",
+                "body_interrupted",
+            }
             else None,
         }
         await self._write(
@@ -566,7 +603,10 @@ class UsageStore:
 
     def attempts(self, request_row_id=None):
         with self._connection() as conn:
-            query = "SELECT * FROM attempts WHERE result IS NOT NULL"
+            query = (
+                "SELECT * FROM attempts WHERE result IS NOT NULL "
+                "AND json_extract(metadata, '$.sent_upstream') IS NOT FALSE"
+            )
             args = ()
             if request_row_id is not None:
                 query += " AND request_row_id = ?"

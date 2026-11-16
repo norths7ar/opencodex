@@ -6,6 +6,7 @@ import logging
 import time
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -16,7 +17,16 @@ from backend.configuration.models import Channel, Configuration
 from .directory import DirectorySnapshot, DirectoryStore, validate_rows
 
 _DAILY = 24 * 60 * 60
+_RETRY_INITIAL = 60
+_RETRY_MAX = 60 * 60
 _LOG = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True, slots=True)
+class RefreshOutcome:
+    snapshot: DirectorySnapshot
+    projection_result: object = None
+    projection_error: str | None = None
 
 
 class CatalogRefresh:
@@ -43,6 +53,7 @@ class CatalogRefresh:
         self._projection = projection
         self._on_changed = on_changed
         self._locks: dict[str, asyncio.Lock] = {}
+        self._outcomes: dict[str, RefreshOutcome] = {}
         self._wake = asyncio.Event()
 
     def _default_fingerprint(self, channel: Channel) -> str:
@@ -76,23 +87,35 @@ class CatalogRefresh:
         """Wake the scheduler after config/auth changes; unchanged snapshots stay fresh."""
         self._wake.set()
 
-    async def refresh(self, channel: Channel, *, force: bool = False) -> DirectorySnapshot | None:
-        started = time.time()
+    async def refresh(
+        self,
+        channel: Channel,
+        *,
+        force: bool = False,
+    ) -> RefreshOutcome | None:
+        observed = self._outcomes.get(channel.id)
+        callback = self._on_changed
         async with self._locks.setdefault(channel.id, asyncio.Lock()):
             current = next((c for c in self._read_config().channels if c.id == channel.id), None)
             if current is None or current.disabled or not current.models.live:
                 return None
             fingerprint = self._fingerprint(current)
             cached = self.snapshot(current)
-            if (
-                cached
-                and (not force or cached.checked >= started)
-                and time.time() - cached.checked < _DAILY
-            ):
-                return cached
+            completed = self._outcomes.get(current.id)
+            if force and completed is not observed and completed and completed.snapshot == cached:
+                # A concurrent caller observes the same refresh AND its client
+                # application result; it must not invent a skipped application.
+                return completed
+            interval = (
+                min(_RETRY_MAX, _RETRY_INITIAL * 2 ** max(0, cached.failures - 1))
+                if cached and cached.status == "failed"
+                else _DAILY
+            )
+            if cached and not force and time.time() - cached.checked < interval:
+                return RefreshOutcome(cached)
             checked_at = datetime.now(UTC).isoformat()
             before = object()
-            if self._on_changed is not None and self._projection is not None:
+            if callback is not None and self._projection is not None:
                 try:
                     before = self._projection(current.id)
                 except Exception:
@@ -121,12 +144,22 @@ class CatalogRefresh:
                 return None
 
             snapshot = DirectorySnapshot(
-                fingerprint, time.time(), rows, status, checked_at, last_success_at, reason
+                fingerprint,
+                time.time(),
+                rows,
+                status,
+                checked_at,
+                last_success_at,
+                reason,
+                failures=min(7, (cached.failures if cached else 0) + 1)
+                if status == "failed"
+                else 0,
             )
             self.store.put(current.id, snapshot, set(channels))
             if status == "ok" and self._reconcile is not None:
                 self._reconcile(latest, tuple(row["id"] for row in rows))
-            if status == "ok" and self._on_changed is not None:
+            projection_result, projection_error = None, None
+            if status == "ok" and callback is not None:
                 try:
                     changed = (
                         self._projection(current.id) != before
@@ -134,16 +167,22 @@ class CatalogRefresh:
                         else cached is None or cached.rows != rows
                     )
                     if changed:
-                        await self._on_changed()
-                except Exception:
+                        projection_result = await callback()
+                except Exception as exc:
+                    projection_error = str(exc)
                     _LOG.exception("Could not project the refreshed model catalog")
-            return snapshot
+            outcome = RefreshOutcome(snapshot, projection_result, projection_error)
+            self._outcomes = {
+                key: value for key, value in self._outcomes.items() if key in channels
+            }
+            self._outcomes[current.id] = outcome
+            return outcome
 
     async def refresh_due(self) -> None:
         await asyncio.gather(*(self.refresh(channel) for channel in self._read_config().channels))
 
     async def run(self) -> None:
-        """Run until cancelled by the application; each connection has a daily TTL."""
+        """Refresh daily after success, with bounded retry backoff after failure."""
         while True:
             self._wake.clear()
             try:

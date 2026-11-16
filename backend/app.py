@@ -14,15 +14,19 @@ from pydantic import ValidationError
 from backend.api.catalog_routes import catalog_router
 from backend.api.channel_routes import channel_router
 from backend.api.console import install_console
+from backend.api.errors import error_body
 from backend.api.generation_routes import generation_router
 from backend.api.import_routes import import_router
 from backend.api.integration_routes import integration_router
 from backend.api.observability_routes import observability_router
+from backend.api.overview_routes import overview_router
 from backend.api.service_routes import service_router
-from backend.api.settings import SettingsService
 from backend.api.settings_routes import settings_router
+from backend.application.errors import ApplicationError
+from backend.application.settings import SettingsService
 from backend.gateway.probes import CompletionProbe
 from backend.gateway.sizing import SizingRecommendations
+from backend.runtime.scheduler import Startup
 from backend.runtime.state import WEB_ROOT
 from backend.services import Services
 
@@ -38,31 +42,49 @@ def create_app(directory: Path, state: dict, stop, *, services=None, web_root=WE
     app.state.services = services
     started = time.monotonic()
 
+    @app.exception_handler(ApplicationError)
+    async def application_error(request: Request, exc):
+        return JSONResponse(error_body(exc.code, str(exc.detail)), exc.status_code)
+
     @app.exception_handler(RequestValidationError)
     @app.exception_handler(ValidationError)
     async def invalid_request(request: Request, exc):
         return JSONResponse(
-            {
-                "error": "Invalid configuration.",
-                "detail": [
+            error_body(
+                "invalid_input",
+                "Invalid configuration.",
+                fields=[
                     {"loc": e["loc"], "msg": e["msg"], "type": e["type"]} for e in exc.errors()
                 ],
-            },
+            ),
             422,
         )
 
     @app.exception_handler(ValueError)
     async def bad_configuration(request: Request, exc):
-        return JSONResponse({"error": str(exc), "detail": str(exc)}, 400)
+        return JSONResponse(error_body("invalid_input", str(exc)), 400)
 
     @app.exception_handler(RuntimeError)
     async def runtime_error(request: Request, exc):
-        return JSONResponse({"error": str(exc), "detail": str(exc)}, 409)
+        return JSONResponse(error_body("operation_conflict", str(exc)), 409)
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc):
+        if not request.url.path.startswith("/api/"):
+            return JSONResponse(
+                exc.detail if isinstance(exc.detail, dict) else {"error": exc.detail},
+                exc.status_code,
+            )
+        detail = exc.detail
+        if isinstance(detail, dict):
+            message = (
+                detail.get("message") or detail.get("error") or detail.get("detail") or str(detail)
+            )
+            code = detail.get("code", "request_failed")
+        else:
+            message, code = str(detail), "request_failed"
         return JSONResponse(
-            exc.detail if isinstance(exc.detail, dict) else {"error": exc.detail}, exc.status_code
+            error_body(code, message, retryable=exc.status_code >= 500), exc.status_code
         )
 
     def report():
@@ -117,7 +139,6 @@ def create_app(directory: Path, state: dict, stop, *, services=None, web_root=WE
                 "integrations",
                 "logs",
                 "usage",
-                "startup",
                 "subagents",
                 "dashboard",
                 "storage",
@@ -158,6 +179,15 @@ def create_app(directory: Path, state: dict, stop, *, services=None, web_root=WE
             }
         }
 
+    overview_startup = Startup(directory, state["port"])
+    app.include_router(
+        overview_router(
+            report=report,
+            milestones=services.milestones,
+            configuration=services.configuration,
+            startup=lambda *, force=False: overview_startup.health(cached=not force),
+        )
+    )
     app.include_router(
         channel_router(
             channels=services.channels,
@@ -189,9 +219,12 @@ def create_app(directory: Path, state: dict, stop, *, services=None, web_root=WE
             sizing=SizingRecommendations(
                 services.dispatcher, services.models, services.configuration
             ),
+            apply_changes=services.changed,
         )
     )
-    app.include_router(integration_router(services.codex, services.dsh))
+    app.include_router(
+        integration_router(services.codex, services.dsh, coordinator=services.integrations)
+    )
     app.include_router(
         service_router(directory, state["port"], client_status=services.codex.status)
     )

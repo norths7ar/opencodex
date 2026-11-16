@@ -25,6 +25,7 @@ class DirectorySnapshot:
     last_success_at: str | None
     reason: str | None = None
     legacy: bool = False
+    failures: int = 0
 
 
 class DirectoryStore:
@@ -64,6 +65,7 @@ class DirectoryStore:
                     discovery.get("lastSuccessAt"),
                     discovery.get("reason"),
                     legacy or entry.get("legacy", False),
+                    max(0, min(7, int(discovery.get("failures", 0)))),
                 )
             except ValueError, TypeError, KeyError, AttributeError:
                 continue
@@ -89,6 +91,7 @@ class DirectoryStore:
                         "checkedAt": value.checked_at,
                         "lastSuccessAt": value.last_success_at,
                         "reason": value.reason,
+                        "failures": value.failures,
                     },
                 }
                 for key, value in proposed.items()

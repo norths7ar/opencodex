@@ -10,17 +10,21 @@ from uuid import uuid4
 
 import httpx
 
-from backend.auth.access import ChannelAuthentication, SubscriptionAuthorizationError
+from backend.auth.access import (
+    ChannelAuthentication,
+    SubscriptionAuthorizationError,
+    SubscriptionRefreshUnavailable,
+)
 from backend.configuration.models import Configuration
 from backend.policies.effort import apply_effort_policy
 from backend.policies.pacing import RequestPacer
+from backend.requests import AttemptContext, AttemptReason, RequestContext
 from backend.telemetry.pricing import pricing_family
 from backend.telemetry.service import Telemetry
 
 from .attempts import PhysicalAttempt
-from .context import AttemptContext, AttemptReason, RequestContext
 from .continuation import Continuations
-from .delivery import DeliveryState, buffered_delivery, stream_delivery
+from .delivery import DeliveryState, bounded_body, buffered_delivery, stream_delivery
 from .preparation import GenerationPreparation, PreparationRoute
 from .routing import Route
 from .transport import HTTPTransport, PreparedSend, until_cancelled
@@ -31,7 +35,7 @@ class GenerationResponse:
     status: int
     headers: dict[str, str]
     state: DeliveryState
-    attempt: PhysicalAttempt
+    attempt: PhysicalAttempt | None
     content: bytes | None = field(default=None, repr=False)
     stream: AsyncIterator[bytes] | None = field(default=None, repr=False)
 
@@ -75,7 +79,7 @@ class GenerationExecutor:
                 spend=spend,
                 auth_mode=channel.auth_mode,
                 price_family=pricing_family(channel),
-                event_stream=prepared.response_mode == "event_stream",
+                event_stream=request.streaming or prepared.response_mode == "event_stream",
             ):
                 yield
 
@@ -145,6 +149,19 @@ class GenerationExecutor:
                         self.authentication.token(channel, rejected=subscription),
                         request.cancellation,
                     )
+                except SubscriptionRefreshUnavailable as exc:
+                    yield GenerationResponse(
+                        exc.status,
+                        {"content-type": "application/json"},
+                        DeliveryState(
+                            terminal="failed", logical_status=exc.status, error_code=exc.code
+                        ),
+                        None,
+                        content=json.dumps(
+                            {"error": {"code": exc.code, "message": str(exc)}}
+                        ).encode(),
+                    )
+                    return
                 except SubscriptionAuthorizationError, httpx.HTTPError:
                     # A real upstream 401 has already settled. Preserve that
                     # verdict for fallback without exposing refresh details.
@@ -210,7 +227,7 @@ class GenerationExecutor:
                 if upstream is None:
                     raise RuntimeError("Upstream response was not opened.")
                 if route.chatgpt and auth_attempt == 0 and upstream.status_code == 401:
-                    async for _ in physical.chunks():
+                    async for _ in bounded_body(physical.chunks()):
                         pass
                     rejected_attempt = physical
                     continue
@@ -289,18 +306,24 @@ class GenerationExecutor:
                 async def chunks(
                     prepared=prepared, upstream=upstream, physical=physical, state=state
                 ):
-                    async for chunk in stream_delivery(
-                        prepared,
-                        upstream,
-                        request.protocol,
-                        model,
-                        source=physical.chunks(),
-                        state=state,
-                        on_terminal=remember,
-                    ):
-                        physical.output_started()
-                        yield chunk
-                    physical.finish_delivery(state)
+                    try:
+                        async for chunk in stream_delivery(
+                            prepared,
+                            upstream,
+                            request.protocol,
+                            model,
+                            source=physical.chunks(),
+                            state=state,
+                            on_terminal=remember,
+                        ):
+                            physical.output_started()
+                            yield chunk
+                        if state.terminal is None:
+                            state.terminal = "incomplete"
+                            state.logical_status = 502
+                            state.error_code = "upstream_interrupted"
+                    finally:
+                        physical.finish_delivery(state)
 
                 stream = chunks()
                 try:

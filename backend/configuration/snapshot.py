@@ -20,7 +20,9 @@ def migration_summary(result: MigrationResult, source_digest: str) -> dict:
     }
 
 
-def prepare_snapshot(source: Path, destination: Path | None = None) -> dict:
+def prepare_snapshot(
+    source: Path, destination: Path | None = None, *, include_sensitive: bool = False
+) -> dict:
     """Read explicitly named input; never activate it or update the input file."""
     original = source.read_bytes()
     try:
@@ -29,11 +31,21 @@ def prepare_snapshot(source: Path, destination: Path | None = None) -> dict:
         raise ValueError("The source is not a UTF-8 JSON configuration.") from None
     result = migrate_legacy(raw)
     summary = migration_summary(result, hashlib.sha256(original).hexdigest())
+    summary["export_kind"] = "sensitive_candidate" if include_sensitive else "redacted_review"
+    summary["contains_sensitive_data"] = include_sensitive and destination is not None
     if destination is None:
         return summary
 
     # A fresh directory makes a candidate distinct from an active state directory.
     destination.mkdir(parents=True, exist_ok=False)
+    if not include_sensitive:
+        # Unknown remainder values can contain arbitrary secrets. A review exports
+        # field coverage, not guessed redactions or an apparently usable config.
+        with (destination / "migration-report.json").open(
+            "x", encoding="utf-8", newline="\n"
+        ) as stream:
+            stream.write(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
+        return summary
     documents = {
         "config.json": result.configuration.model_dump(mode="json", exclude_unset=True),
         "credentials.json": {

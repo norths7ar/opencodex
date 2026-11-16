@@ -9,10 +9,8 @@ from .models import ChannelRequestPolicy, Configuration, CredentialRecord, Custo
 
 _OAUTH_SERVICES = {
     "openai": ("https://chatgpt.com/backend-api/codex", "openai-responses", "chatgpt"),
-    "anthropic": ("https://api.anthropic.com", "anthropic", "anthropic"),
-    "kimi": ("https://api.kimi.com/coding/v1", "openai-chat", "kimi"),
-    "kimi-responses": ("https://api.kimi.com/coding/v1", "openai-responses", "kimi"),
 }
+_RETIRED_OAUTH_IDS = {"anthropic", "kimi", "kimi-responses"}
 _API_SERVICES = {
     ("https://api.openai.com", "key"): "openai",
     ("https://api.openai.com/v1", "key"): "openai",
@@ -253,7 +251,17 @@ def migrate_legacy(raw: dict) -> MigrationResult:
     remainder = {}
     channels = []
     secrets = {}
+    retired_ids = set()
     for index, row in enumerate(providers):
+        if (
+            isinstance(row, dict)
+            and row.get("authMode") == "oauth"
+            and isinstance(row.get("id"), str)
+            and row["id"] in _RETIRED_OAUTH_IDS
+        ):
+            retired_ids.add(row["id"])
+            retired.append(f"/providers/{index}")
+            continue
         channel, credential = _channel(row, index, remainder)
         channels.append(channel)
         if credential and isinstance(channel.get("id"), str):
@@ -261,12 +269,24 @@ def migrate_legacy(raw: dict) -> MigrationResult:
     config = _extract(
         source, {"defaultProvider": "default_channel_id", "defaultModel": "default_model_id"}
     )
+    if (
+        retired_ids
+        and isinstance(config.get("default_channel_id"), str)
+        and (
+            config["default_channel_id"] in retired_ids
+            and not any(channel.get("id") == config["default_channel_id"] for channel in channels)
+        )
+    ):
+        retired.append("/defaultProvider")
+        if "default_model_id" in config:
+            retired.append("/defaultModel")
+        config.update(default_channel_id=None, default_model_id=None)
     config["schema_version"] = 2
     config["channels"] = channels
     config["models"] = _extract(
         source,
         {
-            "disabledModels": "disabled",
+            "disabledModels": "legacy_disabled",
             "customModels": "custom",
             "defaultModelAliases": "default_aliases",
             "modelDiscovery": "discovery",

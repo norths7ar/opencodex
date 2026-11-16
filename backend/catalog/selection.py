@@ -25,13 +25,13 @@ def reconcile_discovery(
     config_updates = {}
 
     def disable(models: Iterable[str]) -> None:
-        selectors = [ModelIdentity(channel.id, model).routed_selector for model in models]
+        selectors = [ModelIdentity(channel.id, model).namespaced_id for model in models]
         disabled = global_updates.get("disabled", config.models.disabled)
         global_updates["disabled"] = list(dict.fromkeys([*disabled, *selectors]))
 
     initial = metadata.initial_selection
     if initial and initial.get("status") == "pending":
-        all_off = len(discovered) >= 20
+        all_off = channel.auth_mode != "oauth" and len(discovered) >= 20
         if all_off:
             disable(discovered)
         initial_selection = {

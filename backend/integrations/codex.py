@@ -3,9 +3,12 @@
 import json
 from pathlib import Path
 
-from . import agent_settings, client_catalog, clients
-from .locks import instance_lock
-from .projection import model_rows
+from backend.catalog.projection import model_rows
+from backend.platform.files import instance_lock
+
+from . import agent_settings, client_catalog, codex_config
+from .agent_roles import fallback_snapshot
+from .files import ClientConfigError, atomic_write
 
 
 class CodexIntegration:
@@ -16,6 +19,42 @@ class CodexIntegration:
         self.catalog = catalog
         self.default_home = Path(home).expanduser().resolve()
         self.path = directory / "clients" / "codex-state.json"
+        self._role_fallbacks: dict[str, tuple[str, ...]] = {}
+
+    def fallback_models(self, primary: str) -> list[str]:
+        return list(self._role_fallbacks.get(primary, ()))
+
+    def refresh_roles(self) -> None:
+        self._role_fallbacks = fallback_snapshot(self.home())
+
+    def default_model(self) -> str | None:
+        value = codex_config.read_document(self.home() / "config.toml").get("model")
+        if value is not None and not isinstance(value, str):
+            raise ClientConfigError("Codex model must be a string.")
+        return value
+
+    def native_agent_settings(self) -> dict:
+        document = codex_config.read_document(self.home() / "config.toml").unwrap()
+        features, agents = document.get("features", {}), document.get("agents", {})
+        if not isinstance(features, dict) or not isinstance(agents, dict):
+            raise ClientConfigError("Codex features and agents must be settings tables.")
+        feature = features.get("multi_agent_v2", False)
+        if isinstance(feature, bool):
+            feature = {"enabled": feature}
+        if not isinstance(feature, dict):
+            raise ClientConfigError("Codex multi_agent_v2 must be a boolean or settings table.")
+        enabled = feature.get("enabled", bool(feature))
+        return {
+            "enabled": enabled,
+            "maxConcurrentThreadsPerSession": feature.get(
+                "max_concurrent_threads_per_session", agents.get("max_threads")
+            ),
+            "agentsEnabled": agents.get("enabled"),
+            "agentsMaxDepth": agents.get("max_depth"),
+            "agentsMaxThreadsConflict": False,
+            "agentsMaxDepthAppliesWhenV2Disabled": not enabled,
+            "pendingClientApply": not self.record().get("enabled", False),
+        }
 
     def record(self) -> dict:
         try:
@@ -24,7 +63,7 @@ class CodexIntegration:
             return {}
 
     def _save(self, record: dict):
-        clients._atomic_write(self.path, json.dumps(record, indent=2), "Codex integration state")
+        atomic_write(self.path, json.dumps(record, indent=2), "Codex integration state")
 
     def home(self, override: str | None = None) -> Path:
         return (
@@ -36,7 +75,9 @@ class CodexIntegration:
 
     def status(self, home: str | None = None) -> dict:
         target = self.home(home)
-        details = clients.status(target, self.directory)
+        if target == self.home():
+            self.refresh_roles()
+        details = codex_config.status(target, self.directory)
         record = self.record()
         configured = details["state"] == "configured"
         desired = record.get("enabled", configured)
@@ -67,16 +108,17 @@ class CodexIntegration:
         }
 
     async def sync(self, home: str | None = None, *, enable: bool | None = None) -> dict:
+        self.refresh_roles()
         target = self.home(home)
         rows = await self.rows()
         config = self.store.read().configuration
         with instance_lock(self.directory, "codex-integration.lock"):
             record = self.record()
             if record.get("home") and record["home"] != str(target) and record.get("enabled"):
-                raise clients.ClientConfigError(
+                raise ClientConfigError(
                     "Restore the currently managed Codex home before applying another home."
                 )
-            current = clients.status(target, self.directory)
+            current = codex_config.status(target, self.directory)
             enabled = (
                 record.get("enabled", current["state"] == "configured")
                 if enable is None
@@ -96,7 +138,7 @@ class CodexIntegration:
                 provider.models.default if provider else None
             ) or config.default_model_id
             if provider is None or provider.disabled or not default_model:
-                raise clients.ClientConfigError(
+                raise ClientConfigError(
                     "Select an available default channel and model before applying Codex."
                 )
             matching = next(
@@ -108,16 +150,14 @@ class CodexIntegration:
                 None,
             )
             if matching is None:
-                raise clients.ClientConfigError(
-                    "The default model is unavailable for client access."
-                )
+                raise ClientConfigError("The default model is unavailable for client access.")
             model = matching["namespaced"]
             enabled_rows = client_catalog.catalog_entries(rows)
             if not enabled_rows:
-                raise clients.ClientConfigError("Select at least one model before applying Codex.")
+                raise ClientConfigError("Select at least one model before applying Codex.")
             if current["state"] == "conflict":
-                raise clients.ClientConfigError(current["reason"])
-            clients.validate_configuration(
+                raise ClientConfigError(current["reason"])
+            codex_config.validate_configuration(
                 target,
                 self.base_url,
                 model,
@@ -128,7 +168,7 @@ class CodexIntegration:
             catalog, routed_entries = client_catalog.prepare_catalog(
                 target, self.directory, rows, config=config
             )
-            clients.reference_config(
+            codex_config.reference_config(
                 target,
                 self.directory,
                 self.base_url,
@@ -147,7 +187,7 @@ class CodexIntegration:
                 path, written = client_catalog.write_catalog(
                     target, self.directory, rows, prepared=catalog
                 )
-                applied = clients.configure(
+                applied = codex_config.configure(
                     target,
                     self.base_url,
                     model,
@@ -159,7 +199,7 @@ class CodexIntegration:
                     target, self.directory, rows, prepared=routed_entries
                 )
                 agent_settings.sync_settings(target, self.directory, config)
-                reference_path = clients.reference_config(
+                reference_path = codex_config.reference_config(
                     target,
                     self.directory,
                     self.base_url,
@@ -173,6 +213,7 @@ class CodexIntegration:
             record.update(home=str(target), enabled=True)
             record.pop("error", None)
             self._save(record)
+            self.refresh_roles()
             return {
                 "ok": True,
                 "status": "applied",
@@ -224,8 +265,8 @@ class CodexIntegration:
             self._save(record)
             try:
                 agent_settings.sync_settings(target, self.directory, restore=True)
-                clients.reference_config(target, self.directory, restore=True)
-                result = clients.restore(target, self.directory)
+                codex_config.reference_config(target, self.directory, restore=True)
+                result = codex_config.restore(target, self.directory)
                 client_catalog.restore_cache(target, self.directory)
                 client_catalog.catalog_path(target, self.directory).unlink(missing_ok=True)
             except (ValueError, RuntimeError, OSError) as exc:
@@ -238,6 +279,7 @@ class CodexIntegration:
 
     async def converge(self) -> dict:
         """Resume the last explicit intent after a process exit during a client write."""
+        self.refresh_roles()
         record = self.record()
         if not record:
             return {"ok": True, "status": "skipped"}

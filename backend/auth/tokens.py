@@ -17,6 +17,10 @@ TERMINAL_CODES = {
 }
 
 
+class InvalidTokenResponse(ValueError):
+    """The token service replied without a usable response."""
+
+
 def claims(token):
     if not isinstance(token, str):
         return {}
@@ -32,7 +36,7 @@ def credentials(payload, previous=None):
     previous = previous or {}
     access = payload.get("access_token")
     if not isinstance(access, str) or not access:
-        raise ValueError("ChatGPT token response is missing its access token.")
+        raise InvalidTokenResponse("ChatGPT token response is missing its access token.")
     account, email = None, None
     for token in (payload.get("id_token", ""), access):
         parsed = claims(token)
@@ -44,7 +48,7 @@ def credentials(payload, previous=None):
             email = email or parsed.get("email") or profile.get("email")
     account = account or previous.get("accountId")
     if not isinstance(account, str) or not account.strip():
-        raise ValueError("ChatGPT token response is missing its account identity.")
+        raise InvalidTokenResponse("ChatGPT token response is missing its account identity.")
     if previous.get("accountId") and previous["accountId"] != account:
         raise ValueError("ChatGPT refresh returned a different account; sign in again.")
     expires = payload.get("expires_in", 3600)

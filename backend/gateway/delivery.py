@@ -7,6 +7,7 @@ from typing import Literal
 
 import httpx
 
+from backend.policies.fallback import upstream_error_code
 from backend.protocols import (
     StreamEncoder,
     chat_chunks,
@@ -16,10 +17,11 @@ from backend.protocols import (
     sse,
 )
 
-from .delivery_sse import ByteLines, SSEObserver
+from .delivery_sse import ByteLines, SSEObserver, UpstreamBodyOverflow
 from .preparation import Inbound, PreparedGeneration, Wire
 
 Terminal = Literal["completed", "incomplete", "failed"]
+MAX_BUFFERED_RESPONSE_BYTES = 16 * 1024 * 1024
 _RESPONSE_TERMINALS = {
     "response.completed": "completed",
     "response.incomplete": "incomplete",
@@ -175,6 +177,22 @@ def _json_object(content: bytes) -> dict:
     return value
 
 
+async def bounded_body(chunks: AsyncIterable[bytes]) -> AsyncIterator[bytes]:
+    total = 0
+    async for chunk in chunks:
+        total += len(chunk)
+        if total > MAX_BUFFERED_RESPONSE_BYTES:
+            raise UpstreamBodyOverflow()
+        yield chunk
+
+
+async def read_buffered_body(chunks: AsyncIterable[bytes]) -> bytes:
+    content = bytearray()
+    async for chunk in bounded_body(chunks):
+        content.extend(chunk)
+    return bytes(content)
+
+
 async def buffered_delivery(
     prepared: PreparedGeneration,
     upstream: httpx.Response,
@@ -187,11 +205,16 @@ async def buffered_delivery(
     state = DeliveryState()
     try:
         if upstream.is_error or upstream.is_redirect:
-            return BufferedDelivery(
-                upstream.status_code, state, content=b"".join([chunk async for chunk in chunks])
-            )
+            content = await read_buffered_body(chunks)
+            if upstream.is_error:
+                code = upstream_error_code(content)
+                state.terminal = "failed"
+                # Store only known refusal codes; a provider can echo request data here.
+                if code in _LOGICAL_ERRORS:
+                    state.error_code = code
+            return BufferedDelivery(upstream.status_code, state, content=content)
         if prepared.response_mode == "event_stream":
-            async for event in events(ByteLines(chunks)):
+            async for event in events(ByteLines(bounded_body(chunks))):
                 state.observe(event, "responses")
             result = state.result
             if result is None:
@@ -205,7 +228,7 @@ async def buffered_delivery(
                     },
                 )
         else:
-            content = b"".join([chunk async for chunk in chunks])
+            content = await read_buffered_body(chunks)
             if not prepared.translated and prepared.native_tools is None:
                 try:
                     state.observe(_json_object(content), prepared.wire, buffered=True)
@@ -234,6 +257,12 @@ async def buffered_delivery(
             result = prepared.native_tools.response(result)
             state.observe(result, prepared.wire, buffered=True)
         return BufferedDelivery(upstream.status_code, state, payload=result)
+    except UpstreamBodyOverflow as exc:
+        if upstream.is_error:
+            # The error body is unavailable, but the received HTTP status still
+            # supports the status-based fallback decision.
+            raise UpstreamBodyOverflow(upstream_error_status=upstream.status_code) from exc
+        raise
     except (ValueError, KeyError, IndexError, TypeError, RecursionError) as exc:
         if isinstance(exc, InvalidUpstreamResponse):
             raise
@@ -301,8 +330,19 @@ async def stream_delivery(
             for frame in encoder.feed(value):
                 yield frame
         result, frames = encoder.finish()
-    except httpx.HTTPError, ValueError, KeyError, IndexError, TypeError, RecursionError:
-        state._terminal("failed", code="upstream_error", normal=False)
+    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError, RecursionError) as exc:
+        code = (
+            "upstream_timeout"
+            if isinstance(exc, httpx.TimeoutException)
+            else "upstream_interrupted"
+            if isinstance(exc, httpx.HTTPError)
+            else exc.code
+            if isinstance(exc, UpstreamBodyOverflow)
+            else "invalid_upstream_response"
+        )
+        state._terminal("failed", code=code, normal=False)
+        if state.error_code == "upstream_timeout":
+            state.logical_status = 504
         notify()
         yield encoder.error(_TRANSLATION_FAILED)
         return

@@ -4,18 +4,22 @@ from typing import Annotated
 
 import anyio
 from fastapi import APIRouter, Body, HTTPException
-from fastapi.responses import JSONResponse
 
-from backend.catalog.identity import ModelIdentity
-from backend.integrations import client_catalog, clients
+from backend.catalog.identity import ModelIdentity, colliding_slugs, projected_selector
+from backend.integrations import client_catalog, codex_config, codex_process
 from backend.integrations.codex import CodexIntegration
+from backend.integrations.coordinator import IntegrationCoordinator
 from backend.integrations.dsh import DshError, DshIntegration
 
-from . import integration_process
+from .errors import error_response
 
 
 def integration_router(
-    integration: CodexIntegration, dsh: DshIntegration, *, process=integration_process
+    integration: CodexIntegration,
+    dsh: DshIntegration,
+    *,
+    coordinator: IntegrationCoordinator,
+    process=codex_process,
 ) -> APIRouter:
     """Mount explicit client operations on services configured by the application."""
     router = APIRouter(prefix="/api")
@@ -27,19 +31,31 @@ def integration_router(
         config = store.read().configuration
         channel = next((p for p in config.channels if p.id == config.default_channel_id), None)
         model = (channel.models.default if channel else None) or config.default_model_id
-        selector = ModelIdentity(channel.id, model).routed_selector if channel and model else ""
+        selector = ""
+        if channel and model:
+            selector = next(
+                (
+                    row.routed_selector
+                    for row in integration.catalog()
+                    if row.identity == ModelIdentity(channel.id, model)
+                ),
+                projected_selector(
+                    ModelIdentity(channel.id, model), colliding_slugs(config.models, channel)
+                ),
+            )
         return {
-            **clients.preview(target, integration.base_url, selector, directory),
+            **codex_config.preview(target, integration.base_url, selector, directory),
             "catalogPath": str(client_catalog.catalog_path(target, directory)),
             "home": str(target),
             "integration": integration.status(home),
+            "lastCatalogApplication": coordinator.last_results.get("codex") if not home else None,
         }
 
     @router.post("/clients/codex/configure")
     async def configure(body: Annotated[dict | None, Body()] = None):
         home = (body or {}).get("home")
         outcome = await integration.sync(home, enable=True)
-        return {**clients.status(integration.home(home), directory), **outcome}
+        return {**codex_config.status(integration.home(home), directory), **outcome}
 
     @router.post("/clients/codex/restore")
     def restore(body: Annotated[dict | None, Body()] = None):
@@ -62,16 +78,15 @@ def integration_router(
                 integration.restore(body.get("home"))
                 outcome = {"message": "Codex configuration restored; the gateway remains running."}
         except (ValueError, RuntimeError, OSError) as exc:
-            return JSONResponse(
-                {
-                    "error": "Codex integration change failed",
-                    "code": "native_integration_failed",
+            return error_response(
+                409,
+                "native_integration_failed",
+                str(exc),
+                context={
                     "clientId": "codex",
                     "reason": "write_failed",
-                    "message": str(exc),
                     "desiredEnabled": enabled,
                 },
-                status_code=409,
             )
         after = integration.status(body.get("home"))
         return {
@@ -107,15 +122,15 @@ def integration_router(
 
     def failure(exc):
         reason = getattr(exc, "reason", "write_failed")
-        return JSONResponse(
-            {
+        return error_response(
+            409,
+            "integration_mutation_failed",
+            str(exc),
+            context={
                 "ok": False,
                 "clientId": "dsh",
-                "code": "integration_mutation_failed",
                 "reason": reason,
-                "message": str(exc),
             },
-            409,
         )
 
     @router.get("/client-integrations")
@@ -124,7 +139,10 @@ def integration_router(
 
     @router.get("/client-integrations/dsh")
     async def status():
-        return dsh.status(await dsh.block())
+        return {
+            **dsh.status(await dsh.block()),
+            "lastCatalogApplication": coordinator.last_results.get("dsh"),
+        }
 
     @router.get("/client-integrations/journal")
     def journal(client: str | None = None):
@@ -155,8 +173,17 @@ def integration_router(
                 body.get("opId"),
                 body.get("confirmDrift") is True,
             )
-            return JSONResponse(result, 200 if result["ok"] else 409)
-        except (DshError, clients.ClientConfigError, OSError) as exc:
+            if not result["ok"]:
+                return error_response(
+                    409,
+                    result.get("code", "integration_conflict"),
+                    result.get(
+                        "message", "The integration preview changed. Review the current plan."
+                    ),
+                    details={"plan": result.get("plan")},
+                )
+            return result
+        except (DshError, codex_config.ClientConfigError, OSError) as exc:
             return failure(exc)
 
     @router.put("/client-integrations/dsh")
@@ -180,7 +207,7 @@ def integration_router(
     def delete_snapshot(opId: str):
         try:
             return dsh.delete_snapshot(opId)
-        except (DshError, clients.ClientConfigError, OSError) as exc:
+        except (DshError, codex_config.ClientConfigError, OSError) as exc:
             return failure(exc)
 
     return router

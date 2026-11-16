@@ -9,9 +9,9 @@ from contextlib import aclosing
 
 from backend.policies.search import MODELS, SearchService, search_plan
 from backend.policies.vision import Auxiliary, BorrowedWorkflow, modalities
+from backend.requests import RequestPurpose
 
 from .compaction_dispatch import child_context
-from .context import RequestPurpose
 
 
 class InternalCallError(RuntimeError):
@@ -66,7 +66,7 @@ async def decoded_events(response):
 
 
 class AuxiliaryDispatch:
-    def __init__(self, config_loader, rows, route, execute, *, auth_status=None):
+    def __init__(self, config_loader, rows, route, execute, *, auth_status=None, route_native):
         self.config_loader, self.rows, self.route, self.execute = (
             config_loader,
             rows,
@@ -74,6 +74,7 @@ class AuxiliaryDispatch:
             execute,
         )
         self.auth_status = auth_status
+        self.route_native = route_native
         self.search_service = SearchService()
         self.vision_cache = OrderedDict()
 
@@ -148,6 +149,7 @@ class AuxiliaryDispatch:
         headers,
         lease,
         *,
+        target,
         scope=None,
         on_round_complete=None,
         helper_channel=None,
@@ -157,7 +159,7 @@ class AuxiliaryDispatch:
         async def complete(payload, _plan):
             child = child_context(context, payload, "responses", RequestPurpose.GENERATION)
             async with self.execute(
-                child, payload, headers, borrowed_lease=borrowed(lease)
+                child, payload, headers, borrowed_lease=borrowed(lease), resolved_route=target
             ) as response:
                 async for event in decoded_events(response):
                     if event.get("type") in {
@@ -174,10 +176,10 @@ class AuxiliaryDispatch:
 
         async def dispatch(protocol, payload, helper_plan):
             connection = helper_channel or helper_plan["backend"]
-            payload = {**payload, "model": f"{connection}/{payload['model']}"}
+            helper = self.route_native(connection, payload["model"])
             child = child_context(context, payload, protocol, RequestPurpose.SEARCH)
             async with self.execute(
-                child, payload, headers, borrowed_lease=borrowed(lease)
+                child, payload, headers, borrowed_lease=borrowed(lease), resolved_route=helper
             ) as response:
                 async for event in decoded_events(response):
                     if event.get("type") != "heartbeat":

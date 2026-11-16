@@ -7,7 +7,25 @@ import re
 
 from .ledger import now_ms
 
-_CLOSE_REASONS = {"terminal", "client_cancel", "non_stream", "body_stall", "body_overflow"}
+_BODY_INTERRUPTION = {"body_stall", "body_overflow", "body_interrupted"}
+_CLOSE_REASONS = {"terminal", "client_cancel", "non_stream"} | _BODY_INTERRUPTION
+_TRANSPORT_ERRORS = {
+    "upstream_failure",
+    "upstream_timeout",
+    "upstream_interrupted",
+    "upstream_transport_error",
+}
+_UPSTREAM_REFUSALS = {
+    "usage_limit_reached": "rate-limit",
+    "rate_limit_exceeded": "rate-limit",
+    "insufficient_quota": "quota-exhausted",
+    "insufficient_credits": "quota-exhausted",
+    "invalid_api_key": "credential-rejected",
+    "authentication_error": "credential-rejected",
+    "permission_denied": "credential-rejected",
+    "invalid_request_error": "payload-rejected",
+    "invalid_prompt": "payload-rejected",
+}
 _TERMINALS = {"completed", "failed", "incomplete"}
 _POOL_MAIN = {"openai-main", "chatgpt-main", "openai-multi-main"}
 _POOL_SUFFIX = re.compile(r"-(p[a-f0-9]{6})$")
@@ -25,12 +43,14 @@ def _provider_label(provider):
 
 
 def _failed(row):
-    status, terminal, close = row["status"], row.get("terminal_status"), row.get("close_reason")
+    status, terminal, close = row.get("status"), row.get("terminal_status"), row.get("close_reason")
+    if status is None:
+        return False
     if status == 499 or close == "client_cancel":
         return False
-    if terminal == "failed":
+    if terminal == "failed" or close in _BODY_INTERRUPTION:
         return True
-    if terminal in {"completed", "incomplete"} or close in {"body_stall", "body_overflow"}:
+    if terminal in {"completed", "incomplete", "cancelled"}:
         return False
     return status != 101 and not 200 <= status < 400
 
@@ -38,24 +58,35 @@ def _failed(row):
 def _failure_evidence(row):
     status = row["status"]
     code = row.get("error_code")
+    code = code if isinstance(code, str) else None
     sends, settled = row.get("send_count"), row.get("settled_sends")
     close = row.get("close_reason")
+    headers_received = row.get("response_headers_received")
     if sends == 0 and code == "invalid_request":
         return "local-refusal", None, "synthetic"
-    if code in {"upstream_failure", "upstream_timeout", "upstream_interrupted"} and (
-        sends is not None and settled is not None and sends > settled
+    if headers_received is False and code in {"upstream_connect_error", "upstream_connect_timeout"}:
+        return "transport-unsent", "pre_headers", "synthetic"
+    if code in _TRANSPORT_ERRORS and (
+        headers_received is False
+        or (
+            headers_received is None
+            and sends is not None
+            and settled is not None
+            and sends > settled
+            and close not in _BODY_INTERRUPTION
+        )
     ):
         return "transport-ambiguous", "pre_headers", "synthetic"
-    if code == "upstream_interrupted" and settled and close in {"body_stall", "body_overflow"}:
+    if close in _BODY_INTERRUPTION and (headers_received is True or settled):
         return "transport-ambiguous", "mid_stream", "synthetic"
     if not settled or close not in {"non_stream", "terminal"}:
         return None
-    if close == "terminal" and code != "upstream_error":
-        # A locally synthesized error at EOF is not an upstream failure response.
-        return None
-    if code == "upstream_error" and status == 502 and close == "terminal":
-        # Lite maps arbitrary upstream error events to logical 502. The status
-        # alone cannot distinguish a provider fault from a rejected payload.
+    phase = "terminal_sse" if close == "terminal" else None
+    if cause := _UPSTREAM_REFUSALS.get(code):
+        return cause, phase, "upstream"
+    # Older rows can have only a generic upstream code and status. An
+    # arbitrary error event mapped to 502 does not prove a provider fault.
+    if close == "terminal" and (code != "upstream_error" or status == 502):
         return None
     cause = {
         401: "credential-rejected",
@@ -71,8 +102,74 @@ def _failure_evidence(row):
     if not cause and 400 <= status < 500 and code == "upstream_error":
         cause = "payload-rejected"
     if cause:
-        return cause, "terminal_sse" if close == "terminal" else None, "upstream"
+        return cause, phase, "upstream"
     return None
+
+
+def failure_log_fields(row):
+    """Project only closed labels supported by the observed stage and cause."""
+    close = row.get("close_reason")
+    if row.get("status") == 499 or close == "client_cancel":
+        return {
+            "failureCause": "client-cancelled",
+            "failureDetail": {"code": "client_closed"},
+        }
+    if not _failed(row):
+        return {}
+    evidence = _failure_evidence(row)
+    cause, phase, source = evidence or (None, None, None)
+    received = row.get("response_headers_received")
+    stage = (
+        "terminal"
+        if close == "terminal"
+        else "semantic-output"
+        if row.get("output_started") and row.get("semantic_output")
+        else "protocol-prelude"
+        if row.get("output_started")
+        else "headers-only"
+        if received is True
+        else "pre-header"
+        if received is False or phase == "pre_headers" or cause == "local-refusal"
+        else None
+    )
+    detail = (
+        close
+        if close in {"body_stall", "body_overflow"}
+        else "stream_ended_early"
+        if close == "body_interrupted"
+        else "header_timeout"
+        if phase == "pre_headers" and row.get("error_code") == "upstream_timeout"
+        else "connect_timeout"
+        if cause == "transport-unsent" and row.get("error_code") == "upstream_connect_timeout"
+        else "connect_failed"
+        if cause == "transport-unsent"
+        else "provider_error"
+        if source == "upstream"
+        else None
+    )
+    resend = (
+        "refused-committed"
+        if stage in {"terminal", "semantic-output"}
+        else "refused-ambiguous"
+        if cause in {"transport-ambiguous", "upstream-fault"}
+        else "refused-futile"
+        if cause in {"quota-exhausted", "policy-refusal", "payload-rejected", "local-refusal"}
+        else "permitted-after-repair"
+        if cause in {"credential-rejected", "payload-too-large"}
+        else "permitted"
+        if cause in {"transport-unsent", "upstream-declined", "rate-limit"}
+        else None
+    )
+    return {
+        key: value
+        for key, value in {
+            "failureCause": cause,
+            "failureStage": stage,
+            "resendPermission": resend,
+            "failureDetail": {"code": detail} if detail else None,
+        }.items()
+        if value is not None
+    }
 
 
 def failure_projection(store):

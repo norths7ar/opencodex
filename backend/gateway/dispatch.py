@@ -6,12 +6,12 @@ import time
 from contextlib import asynccontextmanager
 from hashlib import sha256
 
-import anyio
 import httpx
 
 from backend.policies.fallback import (
     FallbackTarget,
     SimpleFallback,
+    TargetReplayUnavailable,
     failure_trigger,
     prepare_retry,
     retry_headers,
@@ -21,20 +21,31 @@ from backend.policies.pacing import PacingDenied
 from backend.policies.spend_calls import RequestSpend
 from backend.policies.spend_ledger import SpendDenied
 from backend.policies.workflow import WorkflowDenied
+from backend.requests import AttemptReason, Outcome, RequestPurpose, TerminalStatus
 
-from .context import AttemptReason, Outcome, RequestPurpose, TerminalStatus
+from .delivery_sse import UpstreamBodyOverflow
 from .history import subscription_issuer
-from .routing import resolve_route
-from .transport import until_cancelled
+from .routing import native_route, resolve_route
+from .transport import finish_cleanup, until_cancelled
 
 
 class Dispatcher:
-    def __init__(self, config_loader, discovered, executor, workflow, *, spend_ledger=None):
+    def __init__(
+        self,
+        config_loader,
+        discovered,
+        executor,
+        workflow,
+        *,
+        spend_ledger=None,
+        client_selector=None,
+    ):
         self.config_loader = config_loader
         self.discovered = discovered
         self.executor = executor
         self.workflow = workflow
         self.spend_ledger = spend_ledger
+        self.client_selector = client_selector
         self.fallback = SimpleFallback(config_loader, self._route_pair)
         self.subagents = None
         self.policies = None
@@ -46,6 +57,13 @@ class Dispatcher:
     def _route_pair(self, selector):
         route = self.route(selector)
         return route.channel, route.model_id
+
+    def route_native(self, channel_id, model_id):
+        return native_route(self.config_loader(), channel_id, model_id)
+
+    def route_history(self, namespaced_id):
+        channel, _, model = namespaced_id.partition("/")
+        return self.route_native(channel, model)
 
     @staticmethod
     def _reservation(tracker, lease, prepared, channel, model, subscription):
@@ -82,7 +100,7 @@ class Dispatcher:
     async def _replay(self, original, selected, target, cancellation):
         expanded = None
         if original.get("previous_response_id"):
-            route = self.route(selected.selector)
+            route = self.route_native(selected.provider, selected.model)
             credential = (
                 await until_cancelled(
                     self.executor.authentication.token(route.channel), cancellation
@@ -122,13 +140,35 @@ class Dispatcher:
             yield response
 
     @asynccontextmanager
-    async def execute(self, request, body, incoming, *, borrowed_lease=None, prepare_body=None):
+    async def execute(
+        self,
+        request,
+        body,
+        incoming,
+        *,
+        borrowed_lease=None,
+        prepare_body=None,
+        resolved_route=None,
+    ):
         """Keep the context open until the returned stream has been consumed."""
         started = time.monotonic()
         original = copy.deepcopy(body)
-        logical_body = copy.deepcopy(body)
+
+        def normalize_client_selector(selector):
+            if self.client_selector is None or request.parent_request_id is not None:
+                return selector
+            return self.client_selector(
+                self.config_loader(), selector, request.client_id, request.protocol
+            )
+
+        if self.client_selector is not None and request.parent_request_id is None:
+            selector = normalize_client_selector(original.get("model"))
+            if selector is not None:
+                original["model"] = selector
+        logical_body = copy.deepcopy(original)
         incoming = {key.lower(): value for key, value in incoming.items()}
-        first = self.route(original.get("model"))
+        first = resolved_route or self.route(original.get("model"))
+        logical_route = first
         logical_source = FallbackTarget(first.channel.id, first.model_id)
         binding = (
             self.executor.continuations.history.fallback_response_route(
@@ -138,14 +178,21 @@ class Dispatcher:
             else None
         )
         if binding and binding[0] == logical_source.selector:
+            first = self.route_history(binding[1])
             original["model"] = binding[1]
         elif (
-            self.subagents
+            resolved_route is None
+            and self.subagents
             and request.protocol == "responses"
             and request.purpose not in {RequestPurpose.PROBE, RequestPurpose.SIZING}
         ):
-            await self.subagents.select(original, incoming)
-        first = self.route(original.get("model"))
+            await self.subagents.select(
+                original,
+                incoming,
+                lookup_model=body.get("model"),
+                normalize=normalize_client_selector,
+            )
+            first = self.route(original.get("model"))
         selected = FallbackTarget(first.channel.id, first.model_id)
         plan = self.fallback.plan(
             logical_source.provider, logical_source.model, requested=request.requested_model
@@ -161,20 +208,30 @@ class Dispatcher:
         tracker = RequestSpend(self.spend_ledger) if self.spend_ledger else None
         row_id = None
         response = None
-        transport_error = None
+        retry_error = None
         outcome = Outcome(status_code=500, terminal_status=TerminalStatus.FAILED)
         trigger = None
         previous = selected
         delivered_to_caller = False
+        telemetry = self.executor.telemetry
         try:
-            row_id = await self.executor.telemetry.begin_request(request)
+
+            async def begin():
+                nonlocal row_id
+                row_id = await telemetry.begin_request(request)
+
+            await finish_cleanup(begin())
             if (
                 self.policies is not None
                 and request.parent_request_id is None
                 and request.purpose not in {RequestPurpose.PROBE, RequestPurpose.SIZING}
             ):
                 async with self.policies.intercept(
-                    request, logical_body, incoming, lease, logical_source=logical_source.selector
+                    request,
+                    logical_body,
+                    incoming,
+                    lease,
+                    logical_source=logical_route,
                 ) as intercepted:
                     if intercepted is not None:
                         response = intercepted
@@ -209,17 +266,20 @@ class Dispatcher:
                         if index
                         else original
                     )
+                except TargetReplayUnavailable as exc:
+                    self.fallback.record(
+                        plan.source, previous, target, trigger, outcome="skipped", reason=str(exc)
+                    )
+                    continue
                 except (ValueError, RuntimeError) as exc:
                     self.fallback.record(
                         plan.source, previous, target, trigger, outcome="refused", reason=str(exc)
                     )
                     break
-                route = self.route(target.selector)
+                route = self.route_native(target.provider, target.model)
                 changed = target != logical_source
                 headers = retry_headers(incoming) if changed else incoming
-                sent_before = (
-                    len(list(self.executor.telemetry.store.attempts(row_id))) if row_id else 0
-                )
+                sent_before = telemetry.send_count(request)
                 try:
                     if index:
                         self.executor.telemetry.fallback(
@@ -244,9 +304,11 @@ class Dispatcher:
                         prepare_body=prepare_body,
                     ) as current:
                         response = current
-                        transport_error = None
+                        retry_error = None
                         if self.subagents:
-                            self.subagents.note_failure(headers, target.selector, current.status)
+                            self.subagents.note_failure(
+                                headers, route.channel, route.model_id, current.status
+                            )
                         trigger = failure_trigger(
                             current.status, error_code=upstream_error_code(current.content or b"")
                         )
@@ -266,17 +328,37 @@ class Dispatcher:
                                 if current.stream is not None
                                 else None,
                                 error_code=state.error_code,
-                                interrupted=current.stream is not None and state.terminal is None,
+                                interrupted=current.stream is not None
+                                and (
+                                    state.terminal is None
+                                    or state.error_code
+                                    in {
+                                        "adapter_eof",
+                                        "upstream_interrupted",
+                                        "upstream_timeout",
+                                        "body_overflow",
+                                    }
+                                ),
                             )
                             return
                 except SpendDenied, WorkflowDenied, PacingDenied:
                     raise
+                except (httpx.HTTPError, UpstreamBodyOverflow) as exc:
+                    if delivered_to_caller:
+                        raise
+                    retry_error = exc
+                    response = None
+                    trigger = (
+                        failure_trigger(exc.upstream_error_status)
+                        if isinstance(exc, UpstreamBodyOverflow)
+                        else failure_trigger(exception=exc)
+                    )
+                    if not trigger or index == len(targets) - 1:
+                        raise
                 except ValueError, RuntimeError:
                     if delivered_to_caller:
                         raise
-                    sent_after = (
-                        len(list(self.executor.telemetry.store.attempts(row_id))) if row_id else 0
-                    )
+                    sent_after = telemetry.send_count(request)
                     if not index or sent_after != sent_before:
                         raise
                     self.fallback.record(
@@ -288,63 +370,74 @@ class Dispatcher:
                         reason="The backup cannot prepare this request.",
                     )
                     continue
-                except httpx.HTTPError as exc:
-                    if delivered_to_caller:
-                        raise
-                    transport_error = exc
-                    response = None
-                    trigger = failure_trigger(exception=exc)
-                    if not trigger or index == len(targets) - 1:
-                        raise
                 previous = target
             if response is None:
-                if transport_error is not None:
-                    raise transport_error
+                if retry_error is not None:
+                    raise retry_error
                 raise RuntimeError("No upstream response was produced.")
             yield response
-            outcome = Outcome(status_code=response.status, terminal_status=TerminalStatus.FAILED)
-        except asyncio.CancelledError:
             outcome = Outcome(
-                status_code=499, terminal_status=TerminalStatus.CANCELLED, cancelled=True
+                status_code=response.state.logical_status or response.status,
+                terminal_status=TerminalStatus.FAILED,
+                error_code=response.state.error_code,
+            )
+        except asyncio.CancelledError:
+            disconnected = request.cancellation.is_set()
+            outcome = Outcome(
+                status_code=499 if disconnected else 503,
+                terminal_status=TerminalStatus.CANCELLED,
+                error_code=None if disconnected else "request_cancelled",
+                cancelled=disconnected,
             )
             raise
-        except httpx.TimeoutException:
+        except httpx.TimeoutException as exc:
             outcome = Outcome(
                 status_code=504,
                 terminal_status=TerminalStatus.FAILED,
-                error_code="upstream_timeout",
+                error_code="upstream_connect_timeout"
+                if isinstance(exc, httpx.ConnectTimeout)
+                else "upstream_timeout",
             )
             raise
-        except httpx.HTTPError:
+        except httpx.HTTPError as exc:
             outcome = Outcome(
                 status_code=502,
                 terminal_status=TerminalStatus.FAILED,
-                error_code="upstream_transport_error",
+                error_code="upstream_connect_error"
+                if isinstance(exc, httpx.ConnectError)
+                else "upstream_interrupted"
+                if delivered_to_caller
+                else "upstream_transport_error",
             )
             raise
         except (ValueError, RuntimeError) as exc:
             outcome = Outcome(
                 status_code=getattr(exc, "status", 400),
                 terminal_status=TerminalStatus.FAILED,
-                error_code=getattr(exc, "code", None),
+                error_code=getattr(
+                    exc, "code", "invalid_request" if isinstance(exc, ValueError) else None
+                ),
             )
             raise
         finally:
-            if request.cancellation.is_set():
+            if (
+                request.cancellation.is_set()
+                and outcome.terminal_status == TerminalStatus.INCOMPLETE
+            ):
                 outcome = Outcome(
                     status_code=499, terminal_status=TerminalStatus.CANCELLED, cancelled=True
                 )
-            with anyio.CancelScope(shield=True):
+            attempt = getattr(response, "attempt", None)
+            attempt_context = attempt.context if attempt is not None else None
+
+            async def finalize():
                 try:
-                    await self.executor.telemetry.end_request(
+                    await telemetry.end_request(
                         request,
                         row_id,
                         outcome,
-                        usage=response.attempt.context.usage
-                        if response
-                        and getattr(response, "attempt", None)
-                        and response.attempt.context
-                        else None,
+                        usage=attempt_context.usage if attempt_context else None,
+                        attempt_id=attempt_context.attempt_id if attempt_context else None,
                         duration_ms=(time.monotonic() - started) * 1000,
                     )
                 finally:
@@ -352,3 +445,5 @@ class Dispatcher:
                         tracker.close()
                     if lease and borrowed_lease is None:
                         lease.release()
+
+            await finish_cleanup(finalize())

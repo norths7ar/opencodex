@@ -2,10 +2,8 @@
 
 import ctypes
 import json
-import msvcrt
 import os
 import time
-from contextlib import contextmanager
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import ProxyHandler, Request, build_opener
@@ -20,27 +18,6 @@ def state_directory(value: str | None = None) -> Path:
     if configured:
         return Path(configured).expanduser().resolve()
     return Path(os.environ["LOCALAPPDATA"]) / "OpenCodexLite"
-
-
-@contextmanager
-def instance_lock(directory: Path, name: str):
-    directory.mkdir(parents=True, exist_ok=True)
-    with (directory / name).open("a+b") as handle:
-        if handle.tell() == 0:
-            handle.write(b"\0")
-            handle.flush()
-        handle.seek(0)
-        try:
-            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-        except OSError as exc:
-            raise RuntimeError(
-                "Another ocx command or instance is using this state directory."
-            ) from exc
-        try:
-            yield
-        finally:
-            handle.seek(0)
-            msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
 
 
 def read_state(directory: Path) -> dict:

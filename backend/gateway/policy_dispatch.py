@@ -2,9 +2,9 @@
 
 from contextlib import asynccontextmanager
 
-from backend.integrations.projection import model_rows
+from backend.catalog.projection import model_rows
 from backend.policies.vision import usable_subscription
-from backend.providers.registry import match_destination
+from backend.providers.capabilities import native_compaction, native_search
 
 from .auxiliary import AuxiliaryDispatch, borrowed
 from .compaction_dispatch import dispatch_compaction
@@ -22,6 +22,7 @@ class ExecutionPolicies:
             dispatcher._route_pair,
             dispatcher.execute,
             auth_status=auth_status,
+            route_native=dispatcher.route_native,
         )
 
     async def expand(self, body, source):
@@ -43,14 +44,7 @@ class ExecutionPolicies:
             or channel.protocol_for_model(target.model_id) != "openai-responses"
         ):
             return False
-        match = match_destination(channel)
-        canonical = match is not None and match.service.id in {"openai", "chatgpt"}
-        policy = channel.request_policy
-        return canonical or bool(
-            policy.supportsNativeCompactEndpoint
-            if compact
-            else policy.supportsNativeCompactionTrigger
-        )
+        return native_compaction(channel, target.model_id, compact)
 
     async def save_compaction(self, source, body, result, *, fallback_origin=None):
         credential = (
@@ -86,19 +80,15 @@ class ExecutionPolicies:
             save_response=self.save_compaction,
             logical_source=logical_source,
             binding_lookup=self.dispatcher.executor.continuations.history.fallback_response_route,
+            binding_route=self.dispatcher.route_history,
         ) as response:
             yield response
 
     def native_search(self, target, body):
-        match = match_destination(target.channel)
         route = self.dispatcher.executor.preparation.route(
             target.channel, target.model_id, "responses", body
         )
-        return (
-            route.wire == "responses"
-            and match is not None
-            and match.service.id in {"openai", "chatgpt"}
-        )
+        return native_search(target.channel, route.wire)
 
     @asynccontextmanager
     async def search(

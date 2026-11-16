@@ -5,13 +5,10 @@ from typing import Annotated, Literal
 from pydantic import Field, SecretStr, field_validator, model_validator
 
 from backend.configuration.models import (
-    AuthMode,
     Channel,
     ChannelId,
     CredentialRecord,
-    Endpoints,
     ModelMetadata,
-    Protocol,
     Schema,
 )
 
@@ -80,42 +77,14 @@ class CredentialStatus(Schema):
     label: str | None = None
 
 
-class ChannelView(Schema):
-    """Compact channel summary for lists and overview cards."""
-
-    id: ChannelId
-    service_id: ChannelId
-    name: str
-    protocol: Protocol
-    auth_mode: AuthMode
-    endpoints: Endpoints
-    disabled: bool
-    alias: str | None = None
-    credential: CredentialStatus
-    has_custom_headers: bool
-
-    @classmethod
-    def from_channel(cls, channel: Channel, credential: CredentialStatus, *, has_headers=False):
-        return cls(
-            id=channel.id,
-            service_id=channel.service_id,
-            name=channel.name,
-            protocol=channel.protocol,
-            auth_mode=channel.auth_mode,
-            endpoints=channel.endpoints,
-            disabled=channel.disabled,
-            alias=channel.alias,
-            credential=credential,
-            has_custom_headers=has_headers,
-        )
-
-
 class ChannelDetail(Schema):
     """Editable channel settings; credential values are submitted separately."""
 
     channel: Channel
     credential: CredentialStatus
     has_custom_headers: bool
+    revision: int
+    discovery: DiscoveryState
 
 
 class DiscoveryState(Schema):
@@ -123,6 +92,8 @@ class DiscoveryState(Schema):
     last_success_at: str | None = None
     last_attempt_at: str | None = None
     error: ApiError | None = None
+    stale_default_model: str | None = None
+    stale_aliases: dict[str, str] = Field(default_factory=dict)
 
 
 class ModelIdentity(Schema):
@@ -130,54 +101,52 @@ class ModelIdentity(Schema):
     model_id: str
 
 
-class RefreshCatalog(Schema):
-    channel_id: ChannelId
-
-
-class ModelSelection(Schema):
-    model: ModelIdentity
-    visible: bool
-
-
 class ModelOverrideUpdate(Schema):
     """Omitted properties stay unchanged; null clears an override; [] is an explicit value."""
 
     model: ModelIdentity
     changes: ModelMetadata
+    cost: dict | None = None
+    new_model_id: str | None = None
 
 
-class ApplyResult(Schema):
-    saved: bool
-    application: Literal["applied", "pending", "not_connected"]
-    error: ApiError | None = None
+class ChannelConfigurationEdit(Schema):
+    revision: int
+    channels: list[Channel]
+    default_channel_id: ChannelId | None = None
+    default_model_id: str | None = None
 
 
-class ClientState(Schema):
-    client_id: Literal["codex", "dsh"]
-    desired_enabled: bool
-    application: Literal["applied", "pending", "not_connected", "conflict"]
-    config_path: str | None = None
-    error: ApiError | None = None
+class ChannelList(Schema):
+    revision: int
+    default_channel_id: ChannelId | None
+    default_model_id: str | None
+    channels: list[ChannelDetail]
 
 
-class ServiceState(Schema):
-    gateway: Literal["running", "stopped", "starting", "unknown"]
-    installed: bool
-    startup_enabled: bool
-    console_url: str | None = None
-    error: ApiError | None = None
+class ClientApplicationOutcome(Schema):
+    ok: bool
+    state: str
+    message: str | None = None
+    reason: str | None = None
 
 
-class CatalogChanged(Schema):
-    type: Literal["catalog_changed"] = "catalog_changed"
-    channel_id: ChannelId
-    revision: str
+class ApplicationStatus(Schema):
+    status: Literal["applied", "pending", "skipped", "failed"]
+    clients: dict[str, ClientApplicationOutcome] | None = None
+    message: str | None = None
 
 
-class CredentialChanged(Schema):
-    type: Literal["credential_changed"] = "credential_changed"
-    channel_id: ChannelId
-    status: CredentialStatus
+class ChannelSaved(ChannelDetail):
+    saved: Literal[True] = True
+    application: ApplicationStatus
 
 
-ManagementEvent = Annotated[CatalogChanged | CredentialChanged, Field(discriminator="type")]
+class ChannelDefaultSaved(ChannelList):
+    saved: Literal[True] = True
+    application: ApplicationStatus
+
+
+class ChannelConfigurationSaved(ChannelConfigurationEdit):
+    saved: Literal[True] = True
+    application: ApplicationStatus

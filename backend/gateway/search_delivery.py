@@ -12,10 +12,10 @@ from dataclasses import dataclass, field
 from uuid import uuid4
 
 from backend.protocols import sse
+from backend.requests import RequestContext
 from backend.telemetry.capture import conversation_id
 
 from .auxiliary import AuxiliaryDispatch, InternalCallError
-from .context import RequestContext
 from .delivery import DeliveryState
 from .routing import Route
 from .transport import until_cancelled
@@ -204,6 +204,7 @@ async def dispatch_search(
         request,
         headers,
         lease,
+        target=target,
         scope=scope,
         on_round_complete=rounds.append,
         helper_channel=helper_channel,

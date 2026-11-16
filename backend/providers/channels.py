@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from uuid import uuid4
 
+from backend.auth.access import is_chatgpt_subscription
 from backend.catalog.selection import reconcile_discovery
 from backend.configuration.models import Channel, CredentialRecord
 from backend.configuration.store import ConfigurationState, ConfigurationStore
@@ -39,7 +40,7 @@ class ChannelService:
                 replacement.models.metadata.initial_selection = {
                     "version": 1,
                     "registrationId": str(uuid4()),
-                    "status": "pending",
+                    "status": "ready" if replacement.auth_mode == "oauth" else "pending",
                 }
                 replacement.models = replacement.models.model_copy(
                     update={"metadata": replacement.models.metadata}
@@ -64,22 +65,28 @@ class ChannelService:
         return state
 
     def remove(
-        self, channel_id: str, *, expected_revision: int | None = None
+        self, channel_id: str, *, expected_revision: int | None = None, allow_empty: bool = False
     ) -> ConfigurationState:
         def change(state):
             self.find(state, channel_id)
             config = state.configuration
-            if len(config.channels) == 1:
+            if len(config.channels) == 1 and not allow_empty:
                 raise ValueError("Cannot remove the last provider.")
             config.channels = [channel for channel in config.channels if channel.id != channel_id]
             if config.default_channel_id == channel_id:
                 default = next(
-                    (channel for channel in config.channels if not channel.disabled), None
+                    (
+                        channel
+                        for channel in config.channels
+                        if not channel.disabled
+                        and (channel.auth_mode != "oauth" or is_chatgpt_subscription(channel))
+                    ),
+                    None,
                 )
-                if default is None:
+                if default is None and not allow_empty:
                     raise ValueError("Enable another provider before removing the default.")
-                config.default_channel_id = default.id
-                config.default_model_id = default.models.default
+                config.default_channel_id = default.id if default else None
+                config.default_model_id = default.models.default if default else None
             config.models = config.models.model_copy(
                 update={
                     "custom": [
@@ -88,6 +95,11 @@ class ChannelService:
                     "disabled": [
                         model
                         for model in config.models.disabled
+                        if not model.startswith(channel_id + "/")
+                    ],
+                    "legacy_disabled": [
+                        model
+                        for model in config.models.legacy_disabled
                         if not model.startswith(channel_id + "/")
                     ],
                 }
@@ -104,6 +116,8 @@ class ChannelService:
             channel = self.find(state, channel_id)
             if channel.disabled:
                 raise ValueError("The default provider cannot be disabled.")
+            if channel.auth_mode == "oauth" and not is_chatgpt_subscription(channel):
+                raise ValueError("This subscription is no longer supported.")
             state.configuration.default_channel_id = channel_id
             state.configuration.default_model_id = model_id or channel.models.default
 

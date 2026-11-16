@@ -9,9 +9,18 @@ from urllib.parse import urlsplit
 from fastapi import Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
+from .errors import error_response
+
 
 def install_console(app, token: str, web_root: Path):
     csrf_token = secrets.token_urlsafe(32)
+
+    def refusal(request, status, message):
+        if request.url.path.startswith("/api/"):
+            return error_response(
+                status, "authentication_required" if status == 401 else "access_denied", message
+            )
+        return JSONResponse({"error": message}, status)
 
     @app.middleware("http")
     async def local_boundary(request: Request, call_next):
@@ -24,11 +33,11 @@ def install_console(app, token: str, web_root: Path):
         origin = request.headers.get("origin")
         referer = request.headers.get("referer")
         if not valid or (origin and origin != f"http://{host}"):
-            return JSONResponse({"error": "Only same-origin loopback access is allowed."}, 403)
+            return refusal(request, 403, "Only same-origin loopback access is allowed.")
         if request.headers.get("sec-fetch-site") == "cross-site":
-            return JSONResponse({"error": "Cross-site access is not allowed."}, 403)
+            return refusal(request, 403, "Cross-site access is not allowed.")
         if referer and urlsplit(referer).netloc != host:
-            return JSONResponse({"error": "Cross-origin access is not allowed."}, 403)
+            return refusal(request, 403, "Cross-origin access is not allowed.")
         if request.url.path.startswith("/api/"):
             gui_key = request.headers.get("x-opencodex-api-key", "")
             bearer = request.headers.get("authorization", "")
@@ -36,7 +45,7 @@ def install_console(app, token: str, web_root: Path):
                 secrets.compare_digest(gui_key, token)
                 or secrets.compare_digest(bearer, f"Bearer {token}")
             ):
-                return JSONResponse({"error": "A local console session is required."}, 401)
+                return refusal(request, 401, "A local console session is required.")
             if (
                 gui_key
                 and request.method not in {"GET", "HEAD"}
@@ -44,7 +53,7 @@ def install_console(app, token: str, web_root: Path):
                     request.headers.get("x-opencodex-csrf-token", ""), csrf_token
                 )
             ):
-                return JSONResponse({"error": "A current console CSRF token is required."}, 403)
+                return refusal(request, 403, "A current console CSRF token is required.")
         response = await call_next(request)
         response.headers.setdefault("Cache-Control", "no-store")
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -64,6 +73,8 @@ def install_console(app, token: str, web_root: Path):
 
     @app.get("/{route:path}")
     async def console(route: str):
+        if route.startswith("api/"):
+            return error_response(404, "not_found", "Not found.")
         if route == "healthz" or route.startswith(("api/", "v1/")):
             return JSONResponse({"error": "Not found"}, 404)
         file = (web_root / (route or "index.html")).resolve()

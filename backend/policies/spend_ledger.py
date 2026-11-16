@@ -14,7 +14,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from threading import RLock
 
-from .locks import instance_lock
+from backend.platform.files import instance_lock
+
 from .spend_policy import current_policy
 
 KINDS = ("root", "identity", "pool")

@@ -7,11 +7,11 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from backend.application.storage import Storage
 from backend.configuration.store import ConfigurationStore
 from backend.telemetry.debug import DebugState
 from backend.telemetry.ledger import UsageStore
 
-from .observability_storage import Storage
 from .observability_usage import usage_router
 
 

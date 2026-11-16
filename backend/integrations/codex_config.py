@@ -4,8 +4,6 @@ import hashlib
 import json
 import os
 import re
-import stat
-import tempfile
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +13,9 @@ from tomlkit.exceptions import TOMLKitError
 from tomlkit.items import Comment, Table
 from tomlkit.toml_document import TOMLDocument
 
-from .locks import instance_lock
+from backend.platform.files import instance_lock
+
+from .files import ClientConfigError, assert_regular_file, atomic_write, read_text
 
 _PROVIDER = "opencodex-lite"
 _COMPACTION_PROVIDER = "opencodex"
@@ -26,16 +26,12 @@ _MAX_CONFIG = 1 << 20
 _MAX_JOURNAL = 6 * _MAX_CONFIG + 2048
 
 
-class ClientConfigError(RuntimeError):
-    """An unsafe or unsuccessful config operation (safe to display without a traceback)."""
-
-
 def codex_home(value: str | Path | None = None) -> Path:
     configured = value or os.environ.get("CODEX_HOME")
     return (Path(configured).expanduser() if configured else Path.home() / ".codex").resolve()
 
 
-def _journal_path(home: Path, state_directory: Path) -> Path:
+def config_journal_path(home: Path, state_directory: Path) -> Path:
     home_id = _digest(os.path.normcase(str(home)))
     return state_directory / "clients" / home_id / "codex-config.json"
 
@@ -44,36 +40,14 @@ def _digest(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
 
-def _assert_regular_file(path: Path, label: str) -> None:
-    info = path.lstat()
-    if not stat.S_ISREG(info.st_mode) or (
-        getattr(info, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
-    ):
-        raise ClientConfigError(f"{label} is not a regular file; no changes were made.")
-
-
-def _read(path: Path, limit: int, label: str) -> str | None:
-    try:
-        _assert_regular_file(path, label)
-        with path.open("rb") as handle:
-            data = handle.read(limit + 1)
-        if len(data) > limit:
-            raise ClientConfigError(f"{label} is too large to edit safely.")
-        return data.decode("utf-8")
-    except FileNotFoundError:
-        return None
-    except OSError, UnicodeError:
-        raise ClientConfigError(f"Could not read {label} as UTF-8.") from None
-
-
-def _parse(source: str | None) -> TOMLDocument:
+def parse_document(source: str | None) -> TOMLDocument:
     try:
         return tomlkit.parse((source or "").removeprefix("\ufeff"))
     except TOMLKitError, ValueError, RecursionError:
         raise ClientConfigError("Codex config.toml is not valid TOML.") from None
 
 
-def _render(rendered: str, source: str | None) -> str:
+def render_document(rendered: str, source: str | None) -> str:
     if source:
         crlf = source.count("\r\n")
         if crlf and crlf == source.count("\n"):
@@ -83,31 +57,11 @@ def _render(rendered: str, source: str | None) -> str:
     return rendered
 
 
-def _atomic_write(path: Path, text: str, label: str) -> None:
-    temporary = None
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile(
-            dir=path.parent, prefix=f".{path.name}.", delete=False
-        ) as f:
-            temporary = Path(f.name)
-            f.write(text.encode("utf-8"))
-            f.flush()
-            os.fsync(f.fileno())
-        temporary.replace(path)
-    except OSError:
-        raise ClientConfigError(f"Could not write {label}; check file access and retry.") from None
-    finally:
-        if temporary is not None:
-            with suppress(OSError):
-                temporary.unlink(missing_ok=True)
-
-
 @contextmanager
-def _write_lock(home: Path):
+def write_lock(home: Path):
     try:
         with suppress(FileNotFoundError):
-            _assert_regular_file(home / _LOCK_FILE, "Codex configuration lock")
+            assert_regular_file(home / _LOCK_FILE, "Codex configuration lock")
         with instance_lock(home, _LOCK_FILE):
             yield
     except OSError:
@@ -117,7 +71,7 @@ def _write_lock(home: Path):
 
 
 def _read_journal(path: Path) -> dict | None:
-    raw = _read(path, _MAX_JOURNAL, "Codex recovery journal")
+    raw = read_text(path, _MAX_JOURNAL, "Codex recovery journal")
     if raw is None:
         return None
     try:
@@ -143,7 +97,7 @@ def _read_journal(path: Path) -> dict | None:
 
 def _write_journal(path: Path, original: str | None, revisions: list[dict]) -> None:
     record = {"version": 1, "original": original, "revisions": revisions}
-    _atomic_write(path, json.dumps(record, ensure_ascii=False), "Codex recovery journal")
+    atomic_write(path, json.dumps(record, ensure_ascii=False), "Codex recovery journal")
 
 
 def _owned(
@@ -166,7 +120,7 @@ def _canonical(value: dict | list) -> str:
 
 
 def _verified(candidate: str, expected: dict) -> TOMLDocument:
-    parsed = _parse(candidate)
+    parsed = parse_document(candidate)
     if _canonical(parsed.unwrap()) != _canonical(expected):
         raise ClientConfigError(
             "Could not edit this Codex TOML layout without changing other settings."
@@ -212,9 +166,9 @@ class _Inspection:
         }
 
 
-def _inspect(path: Path, journal_path: Path) -> _Inspection:
-    source = _read(path, _MAX_CONFIG, "Codex config.toml")
-    document = _parse(source)
+def inspect_configuration(path: Path, journal_path: Path) -> _Inspection:
+    source = read_text(path, _MAX_CONFIG, "Codex config.toml")
+    document = parse_document(source)
     journal = _read_journal(journal_path)
     result = _Inspection(path, source, document, journal)
     values = document.unwrap()
@@ -238,7 +192,7 @@ def _inspect(path: Path, journal_path: Path) -> _Inspection:
             ),
             None,
         )
-        baseline = _parse(journal["original"]).unwrap()
+        baseline = parse_document(journal["original"]).unwrap()
         if result.revision is None and not any(
             _owned(
                 values,
@@ -280,7 +234,7 @@ def status(home: Path, state_directory: Path) -> dict:
     home = codex_home(home)
     path = home / "config.toml"
     try:
-        return _inspect(path, _journal_path(home, state_directory)).metadata()
+        return inspect_configuration(path, config_journal_path(home, state_directory)).metadata()
     except ClientConfigError as exc:
         return {
             "configPath": str(path),
@@ -314,11 +268,11 @@ def reference_config(
 ):
     """Journal the original fallback/reference artifact without touching named user profiles."""
     path = home / "opencodex.config.toml"
-    journal_path = _journal_path(home, directory).with_name("codex-reference.json")
-    source = _read(path, _MAX_CONFIG, "Codex reference config")
-    raw = _read(journal_path, _MAX_JOURNAL, "Codex reference journal")
+    journal_path = config_journal_path(home, directory).with_name("codex-reference.json")
+    source = read_text(path, _MAX_CONFIG, "Codex reference config")
+    raw = read_text(journal_path, _MAX_JOURNAL, "Codex reference journal")
     record = json.loads(raw) if raw else None
-    document = _parse(source)
+    document = parse_document(source)
     if (
         record
         and source != record.get("original")
@@ -334,7 +288,7 @@ def reference_config(
         if source in record.get("applied", []):
             candidate = original
         else:
-            baseline = _parse(original)
+            baseline = parse_document(original)
             for key in ("model_provider", "model_catalog_json", "openai_base_url"):
                 if key in baseline:
                     document[key] = baseline[key]
@@ -351,11 +305,11 @@ def reference_config(
                 del providers[_COMPACTION_PROVIDER]
             if not providers and "model_providers" not in baseline:
                 document.pop("model_providers", None)
-            candidate = _render(document.as_string(), source)
+            candidate = render_document(document.as_string(), source)
         if candidate is None:
             path.unlink(missing_ok=True)
         else:
-            _atomic_write(path, candidate, "Codex reference config")
+            atomic_write(path, candidate, "Codex reference config")
         journal_path.unlink()
         return
     if source is None:
@@ -372,7 +326,7 @@ def reference_config(
         if "model_providers" not in document:
             document["model_providers"] = tomlkit.table()
         document["model_providers"][_COMPACTION_PROVIDER] = {
-            "name": "OpenCodex Proxy",
+            "name": "OpenCodex Lite",
             "base_url": gateway_url,
             "wire_api": "responses",
             "requires_openai_auth": True,
@@ -384,17 +338,17 @@ def reference_config(
             del providers[_COMPACTION_PROVIDER]
         if not providers:
             document.pop("model_providers", None)
-    candidate = _render(document.as_string(), source)
+    candidate = render_document(document.as_string(), source)
     if validate or candidate == source:
         return str(path)
-    _unchanged(path, source)
+    ensure_unchanged(path, source)
     next_record = {
         "original": original,
         "applied": [source, candidate],
-        "owned": [_reference_owned(_parse(source)), _reference_owned(document)],
+        "owned": [_reference_owned(parse_document(source)), _reference_owned(document)],
     }
-    _atomic_write(journal_path, json.dumps(next_record), "Codex reference journal")
-    _atomic_write(path, candidate, "Codex reference config")
+    atomic_write(journal_path, json.dumps(next_record), "Codex reference journal")
+    atomic_write(path, candidate, "Codex reference config")
     return str(path)
 
 
@@ -410,7 +364,7 @@ def _update_document(
     # Original OpenCodex Design B: retain Codex's built-in provider identity so
     # existing openai threads keep their routing/history without relabeling.
     if current.revision and not current.revision.get("nativeRouting"):
-        original = _parse(current.journal["original"]).unwrap()
+        original = parse_document(current.journal["original"]).unwrap()
         if original.get("openai_base_url"):
             raise ClientConfigError(
                 "A user-owned openai_base_url must be resolved before migrating legacy routing."
@@ -439,7 +393,7 @@ def _update_document(
         if "model_providers" not in document:
             document["model_providers"] = tomlkit.table()
         provider = {
-            "name": "OpenCodex Proxy",
+            "name": "OpenCodex Lite",
             "base_url": gateway_url,
             "wire_api": "responses",
             "requires_openai_auth": True,
@@ -453,12 +407,12 @@ def _update_document(
         expected["model_catalog_json"] = str(catalog_path)
         document["model_catalog_json"] = str(catalog_path)
     rendered = document.as_string()
-    candidate = _render(rendered, current.source)
+    candidate = render_document(rendered, current.source)
     return candidate, _verified(candidate, expected)
 
 
-def _unchanged(path: Path, before: str | None) -> None:
-    if _read(path, _MAX_CONFIG, "Codex config.toml") != before:
+def ensure_unchanged(path: Path, before: str | None) -> None:
+    if read_text(path, _MAX_CONFIG, "Codex config.toml") != before:
         raise ClientConfigError("Codex config.toml changed during this operation; retry.")
 
 
@@ -474,7 +428,9 @@ def validate_configuration(
     """Preflight the same transformation before publishing the model catalog."""
     _target(gateway_url, model)
     home = codex_home(home)
-    current = _inspect(home / "config.toml", _journal_path(home, state_directory))
+    current = inspect_configuration(
+        home / "config.toml", config_journal_path(home, state_directory)
+    )
     if current.conflict:
         raise ClientConfigError(current.conflict)
     _update_document(current, gateway_url, model, catalog_path, client_compaction)
@@ -492,9 +448,9 @@ def configure(
     _target(gateway_url, model)
     home = codex_home(home)
     path = home / "config.toml"
-    journal_path = _journal_path(home, state_directory)
-    with _write_lock(home):
-        current = _inspect(path, journal_path)
+    journal_path = config_journal_path(home, state_directory)
+    with write_lock(home):
+        current = inspect_configuration(path, journal_path)
         if current.conflict:
             raise ClientConfigError(current.conflict)
         candidate, current.document = _update_document(
@@ -529,10 +485,10 @@ def configure(
             }
             # Record both sides of an update before writing config. An interrupted write can
             # still prove ownership of whichever version reached config.toml.
-            _unchanged(path, current.source)
+            ensure_unchanged(path, current.source)
             _write_journal(journal_path, original, [previous, revision] if previous else [revision])
-            _unchanged(path, current.source)
-            _atomic_write(path, candidate, "Codex config.toml")
+            ensure_unchanged(path, current.source)
+            atomic_write(path, candidate, "Codex config.toml")
             if previous is not None:
                 _write_journal(journal_path, original, [revision])
             current.source = candidate
@@ -595,7 +551,7 @@ def _restore_document(current: _Inspection, original: TOMLDocument) -> str:
         if not document["model_providers"] and "model_providers" not in original:
             del document["model_providers"]
             del expected["model_providers"]
-    candidate = _render(document.as_string(), current.source)
+    candidate = render_document(document.as_string(), current.source)
     _verified(candidate, expected)
     return candidate
 
@@ -603,11 +559,11 @@ def _restore_document(current: _Inspection, original: TOMLDocument) -> str:
 def restore(home: Path, state_directory: Path) -> dict:
     home = codex_home(home)
     path = home / "config.toml"
-    journal_path = _journal_path(home, state_directory)
+    journal_path = config_journal_path(home, state_directory)
     if _read_journal(journal_path) is None:
         return status(home, state_directory)
-    with _write_lock(home):
-        current = _inspect(path, journal_path)
+    with write_lock(home):
+        current = inspect_configuration(path, journal_path)
         if current.conflict:
             raise ClientConfigError(current.conflict)
         if current.journal is None:
@@ -627,7 +583,7 @@ def restore(home: Path, state_directory: Path) -> dict:
         )
         if current.revision is not None:
             original = current.journal["original"]
-            baseline = _parse(original)
+            baseline = parse_document(original)
             if current.revision["pristine"] and current.revision["config"] == _digest(
                 current.source
             ):
@@ -637,12 +593,12 @@ def restore(home: Path, state_directory: Path) -> dict:
                 if original is None and not candidate.strip():
                     candidate = None
             if retain_table:
-                restored = _parse(candidate)
+                restored = parse_document(candidate)
                 if "model_providers" not in restored:
                     restored["model_providers"] = tomlkit.table()
                 restored["model_providers"][_COMPACTION_PROVIDER] = retained_definition
-                candidate = _render(restored.as_string(), original or current.source)
-            _unchanged(path, current.source)
+                candidate = render_document(restored.as_string(), original or current.source)
+            ensure_unchanged(path, current.source)
             if retain_table:
                 inactive = {
                     **current.revision,
@@ -651,18 +607,18 @@ def restore(home: Path, state_directory: Path) -> dict:
                     "pristine": False,
                     "config": _digest(candidate),
                     "owned": _owned(
-                        _parse(candidate).unwrap(),
+                        parse_document(candidate).unwrap(),
                         native=True,
                         compaction=True,
                         legacy=not current.revision.get("catalogOwned", False),
                     ),
                 }
                 _write_journal(journal_path, original, [current.revision, inactive])
-                _unchanged(path, current.source)
+                ensure_unchanged(path, current.source)
             if candidate is None:
                 path.unlink()
             else:
-                _atomic_write(path, candidate, "Codex config.toml")
+                atomic_write(path, candidate, "Codex config.toml")
             current.source = candidate
             if retain_table:
                 _write_journal(journal_path, original, [inactive])
@@ -674,3 +630,8 @@ def restore(home: Path, state_directory: Path) -> dict:
             "configExists": current.source is not None,
             "state": "notConfigured",
         }
+
+
+def read_document(path: Path) -> TOMLDocument:
+    """Read a Codex TOML document without acquiring write ownership."""
+    return parse_document(read_text(path, _MAX_CONFIG, "Codex configuration"))

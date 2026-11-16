@@ -13,6 +13,7 @@ from backend.providers.registry import match_destination
 
 from .chatgpt import ChatGPTAuth
 from .storage import resolve_credential
+from .tokens import InvalidTokenResponse, TokenError
 
 SUBSCRIPTION_HEADERS = (
     "openai-beta",
@@ -37,6 +38,11 @@ class SubscriptionAuthorizationError(ValueError):
     code = "authentication_required"
 
 
+class SubscriptionRefreshUnavailable(ValueError):
+    status = 503
+    code = "subscription_refresh_unavailable"
+
+
 def validate_subscription(channel: Channel):
     match = match_destination(channel)
     binding = channel.oauth_binding
@@ -55,6 +61,16 @@ def validate_subscription(channel: Channel):
         )
     ):
         raise ValueError("ChatGPT authorization requires its subscription connection.")
+
+
+def is_chatgpt_subscription(channel: Channel) -> bool:
+    if channel.auth_mode != "oauth":
+        return False
+    try:
+        validate_subscription(channel)
+    except ValueError:
+        return False
+    return True
 
 
 class ChannelAuthentication:
@@ -108,6 +124,14 @@ class ChannelAuthentication:
                 rejected_access=rejected["access"] if rejected else None,
                 expected_account_id=rejected["accountId"] if rejected else None,
             )
+        except (InvalidTokenResponse, TokenError) as exc:
+            if isinstance(exc, InvalidTokenResponse) or not exc.terminal:
+                raise SubscriptionRefreshUnavailable(
+                    "ChatGPT authorization could not be refreshed; try again later."
+                ) from exc
+            raise SubscriptionAuthorizationError(
+                "Sign in to this gateway's ChatGPT channel first."
+            ) from exc
         except (ValueError, RuntimeError) as exc:
             raise SubscriptionAuthorizationError(
                 "Sign in to this gateway's ChatGPT channel first."

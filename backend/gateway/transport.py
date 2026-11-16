@@ -8,7 +8,23 @@ from dataclasses import dataclass, field
 import anyio
 import httpx
 
-from .context import CancellationSignal, WireProtocol
+from backend.requests import CancellationSignal, WireProtocol
+
+
+async def finish_cleanup[T](operation: Awaitable[T]) -> T:
+    """Finish owned cleanup even when the caller receives repeated native cancels."""
+    task = asyncio.ensure_future(operation)
+    interrupted = False
+    with anyio.CancelScope(shield=True):
+        while not task.done():
+            try:
+                await asyncio.shield(task)
+            except asyncio.CancelledError:
+                interrupted = True
+    result = task.result()
+    if interrupted:
+        raise asyncio.CancelledError
+    return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,8 +109,7 @@ class HTTPTransport:
                 raise asyncio.CancelledError
             yield response
         finally:
-            with anyio.CancelScope(shield=True):
-                await response.aclose()
+            await finish_cleanup(response.aclose())
 
     @staticmethod
     async def chunks(

@@ -7,7 +7,7 @@ before commit and optional revision checks reject stale edits.
 import math
 from typing import Any
 
-from backend.catalog.identity import ModelIdentity
+from backend.catalog.identity import ModelIdentity, legacy_disabled_candidates
 from backend.configuration.models import AgentSettings, RequestSettings
 from backend.configuration.store import ConfigurationStore
 from backend.policies.compaction import CompactionRouting
@@ -198,22 +198,30 @@ class SettingsService:
             if channel is None:
                 raise ValueError("Channel does not exist.")
             disabled = set(config.models.disabled)
+            legacy = set(config.models.legacy_disabled)
             if enabled and all_channel:
                 channel.models.selected = []
                 disabled = {s for s in disabled if not s.startswith(channel_id + "/")}
+                legacy = {s for s in legacy if not s.startswith(channel_id + "/")}
             elif enabled:
                 if channel.models.selected:
                     channel.models.selected = list(
                         dict.fromkeys([*channel.models.selected, *models])
                     )
-                for model in models:
-                    disabled.discard(ModelIdentity(channel_id, model).routed_selector)
-                    disabled.discard(f"{channel_id}/{model}")
-            else:
-                disabled.update(
-                    ModelIdentity(channel_id, model).routed_selector for model in models
+                disabled.difference_update(
+                    ModelIdentity(channel_id, model).namespaced_id for model in models
                 )
+                legacy.difference_update(
+                    spelling
+                    for spelling, candidates in legacy_disabled_candidates(
+                        config.models, channel, models
+                    ).items()
+                    if len(candidates) == 1 and candidates <= set(models)
+                )
+            else:
+                disabled.update(ModelIdentity(channel_id, model).namespaced_id for model in models)
             config.models.disabled = sorted(disabled)
+            config.models.legacy_disabled = sorted(legacy)
 
         return self._update(change, expected_revision)
 
@@ -261,9 +269,17 @@ class SettingsService:
 
     def set_disabled_models(self, models: list[str], *, expected_revision=None) -> dict:
         models = list(dict.fromkeys(_strings(models, "models")))
-        return self._update(
-            lambda config: setattr(config.models, "disabled", models), expected_revision
-        )
+
+        def change(config):
+            channels = {channel.id for channel in config.channels}
+            for value in models:
+                channel, separator, native = value.partition("/")
+                if not separator or channel not in channels or not native.strip():
+                    raise ValueError("Use channel/model identities for disabled models.")
+            config.models.disabled = models
+            config.models.legacy_disabled = []
+
+        return self._update(change, expected_revision)
 
     def set_discovery_policy(
         self, policy: str, *, channel_id: str | None = None, expected_revision=None

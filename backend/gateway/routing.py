@@ -13,6 +13,15 @@ class Route:
     model_id: str
 
 
+def native_route(config: Configuration, channel_id: str, model_id: str) -> Route:
+    channel = next((channel for channel in config.channels if channel.id == channel_id), None)
+    if channel is None:
+        raise ValueError("Provider not found.")
+    if channel.disabled:
+        raise ValueError("This provider is disabled.")
+    return Route(channel, model_id)
+
+
 def resolve_route(
     config: Configuration,
     requested_model: str | None,
@@ -25,6 +34,8 @@ def resolve_route(
     )
     if not model:
         raise ValueError("Select a model first.")
+    if not requested_model and default:
+        return native_route(config, default.id, model)
     names = {
         name: channel.id
         for channel in config.channels
@@ -34,21 +45,11 @@ def resolve_route(
     if "/" in model and model.split("/", 1)[0] in names:
         name, model = model.split("/", 1)
         channel_id = names[name]
-    elif "/" not in model and (
-        model.startswith(("gpt-", "o1-", "o3-", "o4-")) or model == "codex-auto-review"
-    ):
-        channel_id = "openai"
-        if channel_id not in channels or channels[channel_id].disabled:
-            raise ValueError(f"Model {model} requires the enabled openai channel.")
     else:
         channel_id = config.default_channel_id
     if not channel_id:
         raise ValueError("Use provider/model or select a default provider.")
-    channel = channels.get(channel_id)
-    if channel is None:
-        raise ValueError("Provider not found.")
-    if channel.disabled:
-        raise ValueError("This provider is disabled.")
+    channel = native_route(config, channel_id, model).channel
     known = set(discovered.get(channel.id, () if channel.models.live else channel.models.static))
     known.update(custom.modelId for custom in config.models.custom if custom.provider == channel.id)
     known.update(channel.models.aliases)

@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
+from .model_identity import remember_selector_collisions, selector_collisions
 from .models import Configuration, CredentialRecord
 
 T = TypeVar("T")
@@ -50,8 +51,13 @@ class ConfigurationStore:
         if row is None:
             return ConfigurationState(Configuration())
         revision, document, credentials = row
+        config = json.loads(document)
+        models = config.get("models") if isinstance(config, dict) else None
+        # Older v2 documents mixed exact IDs and lossy Codex selectors.
+        if isinstance(models, dict) and "disabled" in models and "legacy_disabled" not in models:
+            models["legacy_disabled"] = models.pop("disabled")
         return ConfigurationState(
-            Configuration.model_validate_json(document),
+            Configuration.model_validate(config),
             {
                 key: CredentialRecord.model_validate(value)
                 for key, value in json.loads(credentials).items()
@@ -75,10 +81,14 @@ class ConfigurationStore:
             state = self._read(connection)
             if expected_revision is not None and state.revision != expected_revision:
                 raise RevisionConflict("Configuration changed; reload before saving.")
+            previous = selector_collisions(state.configuration)
             result = change(state)
+            remember_selector_collisions(previous, state.configuration)
             # Assignment may occur inside a callback. Revalidate the resulting document.
             document = state.configuration.model_dump(mode="json", exclude_unset=True)
             document["schema_version"] = 2
+            if "disabled" in document.get("models", {}):
+                document["models"].setdefault("legacy_disabled", [])
             state.configuration = Configuration.model_validate(document)
             identities = {channel.id for channel in state.configuration.channels}
             if state.credentials.keys() - identities:
