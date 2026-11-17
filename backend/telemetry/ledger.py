@@ -236,13 +236,13 @@ def normalize_usage(raw: dict | None) -> dict | None:
 class UsageStore:
     """Small indexed ledger. Writes fail open for inference, but reports fail visibly."""
 
-    def __init__(self, directory: Path, *, max_bytes: int | None = None):
+    def __init__(self, directory: Path, *, max_bytes: int | float | None = None):
         self.path = directory / "usage.sqlite3"
         # JSON's numeric syntax can express an integer using a decimal or
         # exponent; match the original safe-integer validation, excluding bool.
         self.max_bytes = (
             int(max_bytes)
-            if type(max_bytes) in {int, float}
+            if (type(max_bytes) is int or type(max_bytes) is float)
             and MIN_USAGE_LEDGER_MAX_BYTES <= max_bytes < (1 << 53)
             and max_bytes == int(max_bytes)
             else None
@@ -408,7 +408,7 @@ class UsageStore:
             "usage_status": usage_status,
             "usage": counters,
             "duration_ms": round(duration_ms)
-            if type(duration_ms) in {int, float} and 0 <= duration_ms < 1e12
+            if (type(duration_ms) is int or type(duration_ms) is float) and 0 <= duration_ms < 1e12
             else None,
             "error_code": error_code
             if isinstance(error_code, str) and re.fullmatch(r"[a-zA-Z0-9_.-]{1,64}", error_code)

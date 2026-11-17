@@ -79,7 +79,8 @@ class Telemetry:
             self._sends[owner][attempt.attempt_id] = facts
 
     def send_count(self, request: RequestContext) -> int:
-        return len(self._sends.get(self._owners.get(request.request_id), ()))
+        owner = self._owners.get(request.request_id)
+        return len(self._sends.get(owner, ())) if owner is not None else 0
 
     def upstream_status(self, attempt: AttemptContext, status: int) -> None:
         self._provider_event(
@@ -173,7 +174,7 @@ class Telemetry:
             }
         ):
             attempt_id = direct[-1]
-        facts = sends.get(attempt_id)
+        facts = sends.get(attempt_id) if attempt_id is not None else None
         successful_generation = (
             request.parent_request_id is None
             and request.purpose == RequestPurpose.GENERATION

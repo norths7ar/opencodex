@@ -161,7 +161,7 @@ class UsageCapture:
                         "authentication_error": 401,
                         "permission_denied": 403,
                         "invalid_request_error": 400,
-                    }.get(reason or code, 502)
+                    }.get(reason or code or "", 502)
                 )
         elif kind == "message_stop":
             self.terminal_status = "completed"

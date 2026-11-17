@@ -27,6 +27,7 @@ packages = ["backend"]
 
 [dependency-groups]
 dev = [
+    "pyright==1.1.414",
     "pytest>=9.2.0",
     "ruff==0.17.5",
 ]
@@ -38,3 +39,11 @@ required-version = ">=0.13.8"
 testpaths = ["tests"]
 addopts = "--strict-markers"
 cache_dir = ".tmp/20261117-pytest-cache"
+
+[tool.pyright]
+include = ["backend"]
+typeCheckingMode = "standard"
+pythonVersion = "3.14"
+pythonPlatform = "Windows"
+venvPath = "."
+venv = ".venv"

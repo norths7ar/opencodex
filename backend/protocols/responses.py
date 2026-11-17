@@ -1,6 +1,7 @@
 """Responses request codec."""
 
 import json
+from typing import cast
 
 from .agent_messages import routed_agent_messages
 from .anthropic_reasoning import blocks as thinking_blocks
@@ -161,9 +162,8 @@ def responses_to_chat(body, *, preserve_tool_media=False):
                 raise ValueError(
                     "Opaque reasoning cannot be replayed to a different wire protocol."
                 )
-            reasoning += text_content(item.get("summary", [])) or "".join(
-                p.get("text", "") for p in item.get("summary", [])
-            )
+            summary = cast(list[dict[str, str]], item.get("summary", []))
+            reasoning += text_content(summary) or "".join(p.get("text", "") for p in summary)
         else:
             raise ValueError(f"The translated route cannot represent Responses item {kind!r}.")
     if reasoning_details:

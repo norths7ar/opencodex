@@ -8,6 +8,7 @@ import math
 import secrets
 import time
 import webbrowser
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlsplit
 
@@ -42,8 +43,8 @@ class ChatGPTAuth:
         self.lock = asyncio.Lock()
         self.flow = None
         self.revision = 0
-        self.on_change = None
-        self.validate = None
+        self.on_change: Callable[[], Awaitable[None]] | None = None
+        self.validate: Callable[[dict[str, object]], Awaitable[None]] | None = None
 
     @property
     def path(self):

@@ -15,8 +15,8 @@ def _observed_ids(models: GlobalModels, channel: Channel) -> set[str]:
     return {
         native_id
         for field in ("ids", "removed")
-        if isinstance(roster, dict) and isinstance(roster.get(field), list)
-        for native_id in roster[field]
+        if isinstance(roster, dict) and isinstance(values := roster.get(field), list)
+        for native_id in values
         if isinstance(native_id, str)
     }
 

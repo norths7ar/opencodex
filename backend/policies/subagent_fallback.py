@@ -3,7 +3,9 @@
 import asyncio
 import json
 import time
+from collections.abc import Awaitable, Callable
 
+from backend.auth.quota import Observation
 from backend.catalog.identity import disabled_model_ids
 
 
@@ -22,7 +24,7 @@ class SubagentFallback:
         self.config_loader = config_loader
         self.route = route
         self.fallback_models = fallback_models
-        self.quota_reader = None
+        self.quota_reader: Callable[[], Awaitable[Observation | None]] | None = None
         self.health = {}
         self.checked_at = 0
         self.quota = None

@@ -4,6 +4,7 @@ import asyncio
 import copy
 import json
 import time
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from uuid import uuid4
@@ -20,9 +21,10 @@ from backend.policies.compaction import (
 )
 from backend.policies.fallback import FallbackTarget, prepare_retry, retry_headers
 from backend.protocols import sse
-from backend.requests import RequestContext, RequestPurpose
+from backend.requests import RequestContext, RequestPurpose, WireProtocol
 
 from .delivery import DeliveryState
+from .execution import GenerationResponse
 from .transport import until_cancelled
 
 
@@ -36,7 +38,7 @@ class CompactionResponse:
 
 
 def child_context(
-    parent: RequestContext, body: dict, protocol: str, purpose: RequestPurpose
+    parent: RequestContext, body: dict, protocol: WireProtocol, purpose: RequestPurpose
 ) -> RequestContext:
     return RequestContext(
         request_id=str(uuid4()),
@@ -69,7 +71,7 @@ async def dispatch_compaction(
     logical_source=None,
     binding_lookup=None,
     binding_route=None,
-):
+) -> AsyncIterator[CompactionResponse | GenerationResponse | None]:
     """Yield None when inapplicable, otherwise a native or portable response.
 
     route(selector) returns a Route; expand(body, source) asynchronously returns

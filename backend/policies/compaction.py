@@ -4,6 +4,7 @@ import base64
 import copy
 import json
 import re
+from typing import cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -171,7 +172,7 @@ def routing_override(body, headers, config, *, compact=False):
                 or trigger not in (policy.triggers or ["manual"])
             ):
                 return None
-            if local and detail.get("implementation") != "responses":
+            if local and cast(dict[str, object], detail).get("implementation") != "responses":
                 return None
             if seen is not None and seen != trigger:
                 return None

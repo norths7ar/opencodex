@@ -10,9 +10,15 @@ import json
 from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
+from typing import TypedDict, cast
 from urllib.parse import urlsplit
 
 RATE_KEYS = ("input", "output", "cacheRead", "cacheWrite")
+type Rates = tuple[int | float, ...]
+
+
+class _PriceProvenance(TypedDict):
+    source: str
 
 
 def _index(rows, *, verified_first=False):
@@ -63,15 +69,16 @@ def pricing_family(provider):
     return families[0] if len(families) == 1 else None
 
 
-def _rates(value):
+def _rates(value) -> Rates | None:
     if not isinstance(value, dict):
         return None
     values = tuple(value.get(key) for key in RATE_KEYS)
-    return (
-        values
-        if all(type(item) in {int, float} and 0 <= item <= 1_000_000 for item in values)
-        else None
-    )
+    if all(
+        (type(item) is int or type(item) is float) and 0 <= item <= 1_000_000 for item in values
+    ):
+        # Each tuple element was checked above; all() does not narrow the tuple type.
+        return cast(Rates, values)
+    return None
 
 
 def _user_rates(overlay):
@@ -139,7 +146,8 @@ def _tier_multiplier(rates, row, family, model, policy):
     if mode == "custom" and not (confirmed and relation == "exclusive"):
         threshold = policy["thresholdTokens"]
         if tokens > threshold or (tokens == threshold and policy["comparison"] == "gte"):
-            rates = _rates(policy["rates"])
+            # Custom policies reach this helper only after _user_rates validates their rates.
+            rates = cast(Rates, _rates(policy["rates"]))
             extras["customThresholdApplied"] = True
     elif mode == "automatic" and catalog and not (confirmed and relation == "exclusive"):
         threshold = catalog["thresholdInputTokens"]
@@ -303,6 +311,8 @@ def estimate_cost(row, provider, official=None):
     if rates is None:
         return None, "price_unmatched"
 
+    # Every successful user, official or bundled match assigns rates and provenance together.
+    provenance = cast(_PriceProvenance, provenance)
     rates, extras = _tier_multiplier(rates, row, family, model, policy)
     reason_by_source = {"user": "provider_cost_overlay", "expected": "expected_price_overlay"}
     reasons = list(official_reasons)

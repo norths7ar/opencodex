@@ -6,6 +6,7 @@ import json
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
+from typing import cast
 from uuid import uuid4
 
 import httpx
@@ -15,7 +16,7 @@ from backend.auth.access import (
     SubscriptionAuthorizationError,
     SubscriptionRefreshUnavailable,
 )
-from backend.configuration.models import Configuration
+from backend.configuration.models import Channel, Configuration
 from backend.policies.effort import apply_effort_policy
 from backend.policies.pacing import RequestPacer
 from backend.requests import AttemptContext, AttemptReason, RequestContext
@@ -25,7 +26,7 @@ from backend.telemetry.service import Telemetry
 from .attempts import PhysicalAttempt
 from .continuation import Continuations
 from .delivery import DeliveryState, bounded_body, buffered_delivery, stream_delivery
-from .preparation import GenerationPreparation, PreparationRoute
+from .preparation import GenerationPreparation, Inbound, PreparationRoute
 from .routing import Route
 from .transport import HTTPTransport, PreparedSend, until_cancelled
 
@@ -61,7 +62,9 @@ class GenerationExecutor:
         self.telemetry = telemetry
         self.continuations = continuations
         self.pacer = RequestPacer()
-        self.observe_response = None
+        self.observe_response: (
+            Callable[[Channel, dict[str, object] | None, httpx.Headers, str], None] | None
+        ) = None
 
     @asynccontextmanager
     async def _send(
@@ -101,7 +104,9 @@ class GenerationExecutor:
             [dict, PreparationRoute, Route, RequestContext], Awaitable[dict | None]
         ]
         | None = None,
-    ):
+    ) -> AsyncIterator[GenerationResponse]:
+        # Alpha search has a separate executor; generation routes only use Inbound.
+        inbound = cast(Inbound, request.protocol)
         if request.cancellation.is_set():
             raise asyncio.CancelledError
         channel, model = target.channel, target.model_id
@@ -110,7 +115,7 @@ class GenerationExecutor:
             body, incoming, configuration, channel, model, request.protocol, metadata
         )
         route = self.preparation.route(
-            channel, model, request.protocol, body, fallback_origin=fallback_origin
+            channel, model, inbound, body, fallback_origin=fallback_origin
         )
         subscription = (
             await until_cancelled(self.authentication.token(channel), request.cancellation)
@@ -176,7 +181,7 @@ class GenerationExecutor:
                         content=b'{"error":{"code":"upstream_error","message":"Upstream authorization failed."}}',
                     )
                     return
-                if renewed["accountId"] != subscription["accountId"]:
+                if renewed["accountId"] != cast(dict[str, object], subscription)["accountId"]:
                     raise ValueError("The active ChatGPT account changed; retry the request.")
                 subscription = renewed
                 prepared = await until_cancelled(
@@ -272,7 +277,7 @@ class GenerationExecutor:
 
                 if not request.streaming or not upstream.is_success:
                     delivered = await buffered_delivery(
-                        prepared, upstream, request.protocol, source=physical.chunks()
+                        prepared, upstream, inbound, source=physical.chunks()
                     )
                     physical.finish_delivery(delivered.state)
                     remember(delivered.state)
@@ -310,7 +315,7 @@ class GenerationExecutor:
                         async for chunk in stream_delivery(
                             prepared,
                             upstream,
-                            request.protocol,
+                            inbound,
                             model,
                             source=physical.chunks(),
                             state=state,

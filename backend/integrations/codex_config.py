@@ -7,10 +7,11 @@ import re
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
+from typing import NotRequired, TypedDict, cast
 
 import tomlkit
 from tomlkit.exceptions import TOMLKitError
-from tomlkit.items import Comment, Table
+from tomlkit.items import Comment, Item, Table
 from tomlkit.toml_document import TOMLDocument
 
 from backend.platform.files import instance_lock
@@ -24,6 +25,23 @@ _ROOT_KEYS = ("model", "model_provider", "model_catalog_json")
 _NATIVE_ROOT_KEYS = (*_ROOT_KEYS, "openai_base_url")
 _MAX_CONFIG = 1 << 20
 _MAX_JOURNAL = 6 * _MAX_CONFIG + 2048
+
+
+class _Revision(TypedDict):
+    pristine: bool
+    config: str
+    owned: str
+    nativeRouting: NotRequired[bool]
+    clientCompaction: NotRequired[bool]
+    compactionTableOwned: NotRequired[bool]
+    catalogOwned: NotRequired[bool]
+    inactive: NotRequired[bool]
+
+
+class _Journal(TypedDict):
+    version: int
+    original: str | None
+    revisions: list[_Revision]
 
 
 def codex_home(value: str | Path | None = None) -> Path:
@@ -70,7 +88,7 @@ def write_lock(home: Path):
         ) from None
 
 
-def _read_journal(path: Path) -> dict | None:
+def _read_journal(path: Path) -> _Journal | None:
     raw = read_text(path, _MAX_JOURNAL, "Codex recovery journal")
     if raw is None:
         return None
@@ -95,7 +113,7 @@ def _read_journal(path: Path) -> dict | None:
     raise ClientConfigError("Codex recovery journal is invalid; it was left untouched.")
 
 
-def _write_journal(path: Path, original: str | None, revisions: list[dict]) -> None:
+def _write_journal(path: Path, original: str | None, revisions: list[_Revision]) -> None:
     record = {"version": 1, "original": original, "revisions": revisions}
     atomic_write(path, json.dumps(record, ensure_ascii=False), "Codex recovery journal")
 
@@ -133,8 +151,8 @@ class _Inspection:
     path: Path
     source: str | None
     document: TOMLDocument
-    journal: dict | None
-    revision: dict | None = None
+    journal: _Journal | None
+    revision: _Revision | None = None
     conflict: str | None = None
 
     def metadata(self) -> dict:
@@ -364,7 +382,8 @@ def _update_document(
     # Original OpenCodex Design B: retain Codex's built-in provider identity so
     # existing openai threads keep their routing/history without relabeling.
     if current.revision and not current.revision.get("nativeRouting"):
-        original = parse_document(current.journal["original"]).unwrap()
+        # inspect_configuration selects revisions only from an existing journal.
+        original = parse_document(cast(_Journal, current.journal)["original"]).unwrap()
         if original.get("openai_base_url"):
             raise ClientConfigError(
                 "A user-owned openai_base_url must be resolved before migrating legacy routing."
@@ -462,11 +481,15 @@ def configure(
             )
         if candidate != current.source:
             previous = current.revision
-            original = current.journal["original"] if previous is not None else current.source
-            pristine = previous is None or (
-                previous["pristine"] and previous["config"] == _digest(current.source)
+            original = (
+                cast(_Journal, current.journal)["original"]
+                if previous is not None
+                else current.source
             )
-            revision = {
+            pristine = previous is None or (
+                previous["pristine"] and previous["config"] == _digest(cast(str, current.source))
+            )
+            revision: _Revision = {
                 "pristine": pristine,
                 "config": _digest(candidate),
                 "owned": _owned(
@@ -514,22 +537,25 @@ def _restore_document(current: _Inspection, original: TOMLDocument) -> str:
     document = current.document
     expected = document.unwrap()
     baseline_values = original.unwrap()
-    native = current.revision.get("nativeRouting", False)
+    # restore calls this only for a matched managed revision.
+    revision = cast(_Revision, current.revision)
+    native = revision.get("nativeRouting", False)
     root_keys = _NATIVE_ROOT_KEYS if native else _ROOT_KEYS
-    if not current.revision.get("catalogOwned"):
+    if not revision.get("catalogOwned"):
         root_keys = tuple(key for key in root_keys if key != "model_catalog_json")
     for key in root_keys:
-        trivia = document.item(key).trivia if key in document else None
+        # Inspection restricts these root fields to strings, never table proxies.
+        trivia = cast(Item, document.item(key)).trivia if key in document else None
         if key in original:
             expected[key] = baseline_values[key]
-            baseline = original.item(key)
+            baseline = cast(Item, original.item(key))
             if trivia is not None:
                 baseline.trivia.comment = trivia.comment
                 baseline.trivia.comment_ws = trivia.comment_ws
             document[key] = baseline
         elif key in document:
             del expected[key]
-            _keep_comment(document, trivia.comment)
+            _keep_comment(document, cast(Item, document.item(key)).trivia.comment)
             del document[key]
     if not native:
         providers = document["model_providers"]
@@ -543,9 +569,7 @@ def _restore_document(current: _Inspection, original: TOMLDocument) -> str:
                 _keep_table_comments(document, providers)
             del document["model_providers"]
             del expected["model_providers"]
-    if current.revision.get(
-        "compactionTableOwned", current.revision.get("clientCompaction", False)
-    ):
+    if revision.get("compactionTableOwned", revision.get("clientCompaction", False)):
         del document["model_providers"][_COMPACTION_PROVIDER]
         del expected["model_providers"][_COMPACTION_PROVIDER]
         if not document["model_providers"] and "model_providers" not in original:
@@ -585,7 +609,7 @@ def restore(home: Path, state_directory: Path) -> dict:
             original = current.journal["original"]
             baseline = parse_document(original)
             if current.revision["pristine"] and current.revision["config"] == _digest(
-                current.source
+                cast(str, current.source)
             ):
                 candidate = original
             else:
@@ -599,13 +623,14 @@ def restore(home: Path, state_directory: Path) -> dict:
                 restored["model_providers"][_COMPACTION_PROVIDER] = retained_definition
                 candidate = render_document(restored.as_string(), original or current.source)
             ensure_unchanged(path, current.source)
+            inactive: _Revision | None = None
             if retain_table:
                 inactive = {
                     **current.revision,
                     "inactive": True,
                     "clientCompaction": False,
                     "pristine": False,
-                    "config": _digest(candidate),
+                    "config": _digest(cast(str, candidate)),
                     "owned": _owned(
                         parse_document(candidate).unwrap(),
                         native=True,
@@ -620,7 +645,7 @@ def restore(home: Path, state_directory: Path) -> dict:
             else:
                 atomic_write(path, candidate, "Codex config.toml")
             current.source = candidate
-            if retain_table:
+            if inactive is not None:
                 _write_journal(journal_path, original, [inactive])
                 current.revision = inactive
                 return current.metadata()

@@ -8,6 +8,7 @@ import time
 from datetime import UTC, datetime
 from html import unescape
 from html.parser import HTMLParser
+from typing import cast
 from urllib.parse import urlsplit
 
 import httpx
@@ -20,11 +21,11 @@ class ModelTable(HTMLParser):
 
     def __init__(self):
         super().__init__()
-        self.tables = []
-        self.table = None
-        self.row = None
-        self.cell = None
-        self.spans = {}
+        self.tables: list[list[list[str]]] = []
+        self.table: list[list[str]] | None = None
+        self.row: dict[int, str] | None = None
+        self.cell: tuple[list[str], int, int] | None = None
+        self.spans: dict[int, tuple[int, str]] = {}
         self.column = 0
 
     def handle_starttag(self, tag, attrs):
@@ -42,7 +43,12 @@ class ModelTable(HTMLParser):
                 else:
                     self.spans[column] = remaining - 1, value
         elif tag in {"td", "th"} and self.row is not None:
-            self.cell = ([], int(attrs.get("colspan", 1)), int(attrs.get("rowspan", 1)))
+            # Present span attributes are numeric text; malformed values still fail in int().
+            self.cell = (
+                [],
+                int(cast(str | int, attrs.get("colspan", 1))),
+                int(cast(str | int, attrs.get("rowspan", 1))),
+            )
         elif tag == "br" and self.cell:
             self.cell[0].append(" ")
 
@@ -54,16 +60,19 @@ class ModelTable(HTMLParser):
         if tag in {"td", "th"} and self.cell:
             parts, width, height = self.cell
             value = " ".join("".join(parts).split())
-            while self.column in self.row:
+            # A cell starts only inside a row; retain the existing matching-tag assumption.
+            row = cast(dict[int, str], self.row)
+            while self.column in row:
                 self.column += 1
             for column in range(self.column, self.column + width):
-                self.row[column] = value
+                row[column] = value
                 if height > 1:
                     self.spans[column] = height - 1, value
             self.column += width
             self.cell = None
         elif tag == "tr" and self.row is not None:
-            self.table.append([self.row.get(i, "") for i in range(max(self.row, default=-1) + 1)])
+            table = cast(list[list[str]], self.table)
+            table.append([self.row.get(i, "") for i in range(max(self.row, default=-1) + 1)])
             self.row = None
         elif tag == "table" and self.table is not None:
             self.tables.append(self.table)

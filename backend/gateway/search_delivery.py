@@ -9,8 +9,10 @@ from collections import deque
 from collections.abc import AsyncIterator
 from contextlib import aclosing, asynccontextmanager
 from dataclasses import dataclass, field
+from typing import cast
 from uuid import uuid4
 
+from backend.policies.search_streams import CanonicalSearchResponse
 from backend.protocols import sse
 from backend.requests import RequestContext
 from backend.telemetry.capture import conversation_id
@@ -247,13 +249,13 @@ async def dispatch_search(
                             {"type": f"response.web_search_call.{suffix}", "item_id": identity}
                         )
                 elif kind == "search_end":
-                    item = event["item"]
+                    item = cast(dict[str, object], event["item"])
                     yield wire.frame(
                         {"type": "response.web_search_call.completed", "item_id": item["id"]}
                     )
                     yield wire.frame({"type": "response.output_item.done", "item": item})
                 elif kind == "final":
-                    result = copy.deepcopy(event["response"])
+                    result = copy.deepcopy(cast(CanonicalSearchResponse, event["response"]))
                     status = result.get("status", "completed")
                     if status not in {"completed", "incomplete", "failed"}:
                         raise ValueError("Search returned a nonterminal response.")

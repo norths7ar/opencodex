@@ -10,6 +10,8 @@ import ipaddress
 import re
 import socket
 import ssl
+from collections.abc import AsyncIterable
+from typing import cast
 from urllib.parse import unquote, urlsplit
 from urllib.request import getproxies, proxy_bypass
 
@@ -52,14 +54,14 @@ class PinnedBackend(httpcore.AsyncNetworkBackend):
         *,
         allow_private=False,
         resolver=system_resolver,
-        proxy=None,
-        backend=None,
+        proxy: str | None = None,
+        backend: httpcore.AsyncNetworkBackend | None = None,
         proxy_ssl=None,
         allow_benchmark=False,
         allow_mihomo=False,
     ):
         self.allow_private, self.resolver, self.proxy = allow_private, resolver, proxy
-        self.backend = backend or httpcore.AnyIOBackend()
+        self.backend = backend or cast(httpcore.AsyncNetworkBackend, httpcore.AnyIOBackend())
         self.proxy_ssl = proxy_ssl or ssl.create_default_context()
         self.allow_benchmark = allow_benchmark
         self.allow_mihomo = allow_mihomo
@@ -92,7 +94,7 @@ class PinnedBackend(httpcore.AsyncNetworkBackend):
         raise httpcore.ConnectError("No validated address available.")
 
     async def _tunnel(self, address, port, timeout, local_address, socket_options):
-        parsed = urlsplit(self.proxy)
+        parsed = urlsplit(cast(str, self.proxy))
         if (
             parsed.scheme not in {"http", "https"}
             or not parsed.hostname
@@ -233,7 +235,7 @@ class PinnedTransport(httpx.AsyncBaseTransport):
         return httpx.Response(
             response.status,
             headers=response.headers,
-            stream=AsyncResponseStream(response.stream),
+            stream=AsyncResponseStream(cast(AsyncIterable[bytes], response.stream)),
             extensions=response.extensions,
         )
 

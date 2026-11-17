@@ -62,6 +62,8 @@ Usage & Logs 记录请求状态、渠道与模型、耗时和上游报告的 tok
 
 ### 测试
 
+`pnpm typecheck` 依次检查 Python 后端和前端 TypeScript；也可单独运行 `uv run --locked pyright`。后端使用开发依赖中固定版本的 Pyright，配置位于 `pyproject.toml`，按 Python 3.14、Windows 和 standard 模式检查整个 `backend/`。Ruff 负责 lint 和格式，pytest 负责运行行为，不能替代类型检查。编辑器使用 Pylance 时选择项目的 `.venv` 解释器。
+
 安装开发依赖后，在仓库根目录运行：
 
 ```powershell

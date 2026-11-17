@@ -1,12 +1,14 @@
 """One physical HTTP send with caller-owned cancellation and connection cleanup."""
 
 import asyncio
-from collections.abc import AsyncIterator, Awaitable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
+from typing import cast
 
 import anyio
 import httpx
+from pydantic import JsonValue
 
 from backend.requests import CancellationSignal, WireProtocol
 
@@ -32,7 +34,7 @@ class PreparedSend:
     url: str
     protocol: WireProtocol
     headers: dict[str, str] = field(repr=False)
-    body: dict = field(repr=False)
+    body: JsonValue = field(repr=False)
     channel_id: str = "public"
     allow_private: bool = False
 
@@ -86,19 +88,31 @@ async def until_cancelled[T](
 
 
 class HTTPTransport:
-    def __init__(self, client: httpx.AsyncClient | None = None, *, client_for_send=None):
+    def __init__(
+        self,
+        client: httpx.AsyncClient | None = None,
+        *,
+        client_for_send: Callable[[PreparedSend], httpx.AsyncClient] | None = None,
+    ):
         self.client = client
         self.client_for_send = client_for_send
 
     @asynccontextmanager
     async def open(self, prepared: PreparedSend, cancellation: CancellationSignal):
-        client = self.client_for_send(prepared) if self.client_for_send else self.client
-        payload = (
-            {"content": b"null"}
-            if prepared.protocol == "alpha/search" and prepared.body is None
-            else {"json": prepared.body}
+        # Construction supplies either a fixed client or a destination-scoped factory.
+        client = (
+            self.client_for_send(prepared)
+            if self.client_for_send
+            else cast(httpx.AsyncClient, self.client)
         )
-        request = client.build_request("POST", prepared.url, headers=prepared.headers, **payload)
+        if prepared.protocol == "alpha/search" and prepared.body is None:
+            request = client.build_request(
+                "POST", prepared.url, headers=prepared.headers, content=b"null"
+            )
+        else:
+            request = client.build_request(
+                "POST", prepared.url, headers=prepared.headers, json=prepared.body
+            )
         response = await until_cancelled(
             client.send(request, stream=True),
             cancellation,

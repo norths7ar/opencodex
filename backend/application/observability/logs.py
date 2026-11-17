@@ -207,7 +207,8 @@ def log_page(store, providers, params, epoch, official=None):
     )
     serialized = [(json.dumps(dto, separators=(",", ":")) + "\n").encode() for dto in dtos]
     unchanged = bool(
-        candidate
+        cursor is not None
+        and candidate
         and cursor["n"] <= len(rows)
         and (hashlib.sha256(b"".join(serialized[: cursor["n"]])).hexdigest() == cursor["h"])
     )
@@ -224,7 +225,7 @@ def log_page(store, providers, params, epoch, official=None):
         "timeZone": _timezone(),
         "generatedAt": now_ms(),
         "total": total,
-        "logs": dtos[cursor["n"] :] if unchanged else dtos,
+        "logs": dtos[cursor["n"] :] if cursor is not None and unchanged else dtos,
         "cursor": token,
         "reset": cursor is not None and (not unchanged),
     }

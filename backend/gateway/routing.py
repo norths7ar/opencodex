@@ -28,7 +28,9 @@ def resolve_route(
     discovered: Mapping[str, Iterable[str]],
 ) -> Route:
     channels = {channel.id: channel for channel in config.channels}
-    default = channels.get(config.default_channel_id)
+    default = (
+        channels.get(config.default_channel_id) if config.default_channel_id is not None else None
+    )
     model = (
         requested_model or (default.models.default if default else None) or config.default_model_id
     )

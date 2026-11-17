@@ -4,11 +4,18 @@ import copy
 import json
 import uuid
 from collections import OrderedDict
+from collections.abc import AsyncGenerator
 from contextlib import aclosing
+from typing import cast
 
 from .search_executors import execute_search
 from .search_format import format_results
-from .search_streams import LeadingProgress, iteration_events
+from .search_streams import (
+    CanonicalSearchResponse,
+    LeadingProgress,
+    SearchFunctionCall,
+    iteration_events,
+)
 from .vision import BorrowedWorkflow
 
 DEFAULTS = {
@@ -94,7 +101,8 @@ def queries(call):
         return []
     if not isinstance(value, dict):
         return []
-    values = value.get("queries") if isinstance(value.get("queries"), list) else []
+    raw_values = value.get("queries")
+    values = raw_values if isinstance(raw_values, list) else []
     values = [item for item in values if isinstance(item, str) and item.strip()]
     if values:
         return values
@@ -175,7 +183,9 @@ class SearchService:
     def __init__(self):
         self.replay = SearchReplay()
 
-    async def run(self, body, plan, complete, dispatch, *, scope=None):
+    async def run(
+        self, body, plan, complete, dispatch, *, scope=None
+    ) -> AsyncGenerator[dict[str, object]]:
         request = self.replay.restore(body, scope, True)
         request.pop(
             "previous_response_id", None
@@ -215,7 +225,7 @@ class SearchService:
                     elif kind == "final":
                         if response is not None:
                             raise ValueError("Search model returned multiple terminal responses")
-                        response = event["response"]
+                        response = cast(CanonicalSearchResponse, event["response"])
                     elif response is not None:
                         raise ValueError("Search model returned data after completion")
                     elif leading.accept(event):
@@ -233,7 +243,7 @@ class SearchService:
                 if isinstance(value, int):
                     usage[key] = usage.get(key, 0) + value
             calls = [
-                item
+                cast(SearchFunctionCall, item)
                 for item in items
                 if item.get("type") == "function_call" and item.get("name") == "web_search"
             ]
@@ -262,7 +272,8 @@ class SearchService:
                 }
                 for item in visible:
                     for part in item.get("content", []):
-                        if part.get("type") == "output_text" and part.get("text"):
+                        part_text = part.get("text")
+                        if part.get("type") == "output_text" and part_text:
                             annotations = part.setdefault("annotations", [])
                             existing = {annotation.get("url") for annotation in annotations}
                             annotations.extend(
@@ -271,7 +282,7 @@ class SearchService:
                                     "url": url,
                                     "title": source.get("title", url),
                                     "start_index": 0,
-                                    "end_index": len(part["text"]),
+                                    "end_index": len(part_text),
                                 }
                                 for url, source in sources.items()
                                 if url not in existing
@@ -315,7 +326,8 @@ class SearchService:
                                 else:
                                     yield {"type": "heartbeat"}
                         count += 1
-                        if outcome.get("error"):
+                        # execute_search always yields a final response on normal completion.
+                        if cast(dict[str, object], outcome).get("error"):
                             failed.add(normalized)
                     results.append((query, outcome))
                     yield {"type": "heartbeat"}

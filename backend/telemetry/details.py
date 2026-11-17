@@ -82,7 +82,7 @@ def _failure_evidence(row):
     if not settled or close not in {"non_stream", "terminal"}:
         return None
     phase = "terminal_sse" if close == "terminal" else None
-    if cause := _UPSTREAM_REFUSALS.get(code):
+    if cause := _UPSTREAM_REFUSALS.get(code) if code is not None else None:
         return cause, phase, "upstream"
     # Older rows can have only a generic upstream code and status. An
     # arbitrary error event mapped to 502 does not prove a provider fault.

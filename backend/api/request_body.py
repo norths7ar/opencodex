@@ -16,7 +16,7 @@ class RequestBodyError(ValueError):
         self.status = status
 
 
-def _decode(data: bytes, encoding: str, limit: int) -> bytes:
+def _decode(data: bytes | bytearray, encoding: str, limit: int) -> bytes | bytearray:
     if encoding in {"", "identity"}:
         return data
     if encoding == "zstd":

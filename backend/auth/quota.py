@@ -9,6 +9,7 @@ import time
 from dataclasses import dataclass
 from datetime import UTC
 from email.utils import parsedate_to_datetime
+from typing import cast
 
 import httpx
 
@@ -293,7 +294,7 @@ def retry_after_ms(value):
 
 
 class ProbeFailure(Exception):
-    def __init__(self, code, *, status=None, retry_after=0, terminal=False):
+    def __init__(self, code, *, status=None, retry_after: float = 0, terminal=False):
         super().__init__(code)
         self.code = code
         self.status = status
@@ -480,6 +481,7 @@ class ChatGPTQuota:
 
             dispatched = current
             failure = None
+            successful_probe: tuple[dict[str, object], dict[str, object]] | None = None
             try:
                 dispatched = await self.auth.token(expected_account_id=state.account)
                 if epoch != self.invalidation:
@@ -512,6 +514,7 @@ class ChatGPTQuota:
                 fresh = parse_usage(payload, now_ms())
                 if fresh is None:
                     raise ProbeFailure("response_unusable")
+                successful_probe = (payload, fresh)
             except ProbeFailure as exc:
                 failure = exc
                 if exc.terminal and epoch == self.invalidation:
@@ -541,13 +544,15 @@ class ChatGPTQuota:
                 state.delay_ms = min((state.delay_ms or TTL_MS // 2) * 2, 60 * 60_000)
                 state.retry_at = state.checked_at + max(state.delay_ms, failure.retry_after)
             else:
+                # No failure means both the payload and parsed quota were accepted.
+                payload, fresh = cast(tuple[dict[str, object], dict[str, object]], successful_probe)
                 state.delay_ms = state.retry_at = 0
                 state.plan = plan_name(payload.get("plan_type")) or state.plan
                 self._publish(state, fresh, rate=record(payload.get("rate_limit")))
             return state
 
     def account_fields(self, account, *, enriched=False):
-        fields = {"quotaMode": "probe"}
+        fields: dict[str, object] = {"quotaMode": "probe"}
         credential = self._active()
         if not credential or credential["accountId"] != account:
             return fields
@@ -556,20 +561,21 @@ class ChatGPTQuota:
             fields["plan"] = state.plan
         if enriched:
             failure = "access_denied" if credential.get("needsReauth") else state.failure
-            quota = provider_quota(state.quota)
+            observed = state.quota
+            quota = provider_quota(observed)
             if (
                 quota is None
-                and state.quota
-                and any(key in state.quota for key in ("resetCredits", "credits"))
+                and observed
+                and any(key in observed for key in ("resetCredits", "credits"))
             ):
-                quota = {"updatedAt": state.quota["updatedAt"]}
+                quota = {"updatedAt": observed["updatedAt"]}
             if quota and now_ms() - quota["updatedAt"] < MAX_REPORT_AGE_MS:
                 quota = {
                     **quota,
                     **{
-                        key: state.quota[key]
+                        key: observed[key]
                         for key in ("resetCredits", "credits")
-                        if key in state.quota
+                        if observed is not None and key in observed
                     },
                 }
             else:

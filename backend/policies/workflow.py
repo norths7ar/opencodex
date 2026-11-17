@@ -9,6 +9,7 @@ import threading
 import time
 from collections import deque
 from dataclasses import dataclass, field
+from typing import cast
 
 BOUNDS = {
     "maxConcurrentChildren": {"min": 2, "max": 64},
@@ -243,7 +244,10 @@ class WorkflowBudget:
                 :limit
             ]
             return {
-                "roots": [{"rootId": key, **self._snapshot(key, now, limits)} for key in roots],
+                "roots": [
+                    {"rootId": key, **cast(dict[str, int], self._snapshot(key, now, limits))}
+                    for key in roots
+                ],
                 "events": [event.copy() for event in events[:limit]],
             }
 

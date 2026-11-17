@@ -5,6 +5,7 @@ import codecs
 import copy
 import json
 from collections import OrderedDict
+from collections.abc import AsyncGenerator
 from contextlib import aclosing
 
 from backend.policies.search import MODELS, SearchService, search_plan
@@ -153,7 +154,7 @@ class AuxiliaryDispatch:
         scope=None,
         on_round_complete=None,
         helper_channel=None,
-    ):
+    ) -> AsyncGenerator[dict[str, object]]:
         """Yield search orchestration events; caller owns HTTP/event framing and history."""
 
         async def complete(payload, _plan):

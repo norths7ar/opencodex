@@ -6,6 +6,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import UTC, datetime
+from typing import cast
 
 import httpx
 
@@ -82,7 +83,8 @@ class PhysicalAttempt:
     ):
         if self.context is not None:
             raise RuntimeError("A physical attempt can send only once.")
-        self.context = replace(attempt, sent_at=datetime.now(UTC))
+        opened_context = replace(attempt, sent_at=datetime.now(UTC))
+        self.context = opened_context
         started = time.monotonic()
         send_id = None
         dispatched = False
@@ -97,7 +99,7 @@ class PhysicalAttempt:
                 send_id = await self.telemetry.begin_attempt(
                     request_row_id,
                     request,
-                    self.context,
+                    opened_context,
                     auth_mode=auth_mode,
                     price_family=price_family,
                 )
@@ -176,23 +178,26 @@ class PhysicalAttempt:
                 else UsageStatus.UNREPORTED,
                 self.capture.usage,
             )
-            self.context = replace(
-                self.context,
-                elapsed_ms=(time.monotonic() - started) * 1000,
-                outcome=Outcome(
-                    status_code=status,
-                    terminal_status=TerminalStatus(terminal) if terminal else None,
-                    error_code=error
-                    or (self.delivery.error_code if self.delivery is not None else None)
-                    or self.capture.error_code,
-                    cancelled=client_cancelled,
-                    interrupted=interrupted,
-                ),
+            elapsed_ms = (time.monotonic() - started) * 1000
+            outcome = Outcome(
+                status_code=status,
+                terminal_status=TerminalStatus(terminal) if terminal else None,
+                error_code=error
+                or (self.delivery.error_code if self.delivery is not None else None)
+                or self.capture.error_code,
+                cancelled=client_cancelled,
+                interrupted=interrupted,
+            )
+            finalized_context = replace(
+                cast(AttemptContext, self.context),
+                elapsed_ms=elapsed_ms,
+                outcome=outcome,
                 usage=usage,
                 served_model=self.capture.served_model,
                 response_service_tier=self.capture.service_tier,
             )
-            delivery_error = self.context.outcome.error_code
+            self.context = finalized_context
+            delivery_error = outcome.error_code
             close_reason = (
                 "client_cancel"
                 if client_cancelled
@@ -229,10 +234,12 @@ class PhysicalAttempt:
                     if spend is not None:
                         spend.finish(_settled_usage(self.capture.usage) if complete_usage else None)
                 finally:
-                    await self.telemetry.finalize_attempt(send_id, self.context, facts=self.facts)
+                    await self.telemetry.finalize_attempt(
+                        send_id, finalized_context, facts=self.facts
+                    )
                 if dispatched:
                     await self.telemetry.observe_usage(
-                        self.context,
+                        finalized_context,
                         content_type=self.response.headers.get("content-type")
                         if self.response is not None
                         else None,

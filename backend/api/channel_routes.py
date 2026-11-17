@@ -91,8 +91,8 @@ def channel_router(
             service.parse_edit(body), revision=revision, create=True
         )
         response.headers["X-Config-Revision"] = str(saved)
-        return ChannelSaved(
-            **result.model_dump(exclude_unset=True), saved=True, application=application
+        return ChannelSaved.model_validate(
+            dict(result.model_dump(exclude_unset=True), saved=True, application=application)
         )
 
     @router.put("/channels/{name}", response_model=ChannelSaved, response_model_exclude_unset=True)
@@ -103,8 +103,8 @@ def channel_router(
         service.channel(name)
         result, application, saved = await service.save(edit, revision=revision)
         response.headers["X-Config-Revision"] = str(saved)
-        return ChannelSaved(
-            **result.model_dump(exclude_unset=True), saved=True, application=application
+        return ChannelSaved.model_validate(
+            dict(result.model_dump(exclude_unset=True), saved=True, application=application)
         )
 
     @router.delete("/channels/{name}")

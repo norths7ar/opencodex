@@ -5,6 +5,7 @@ import copy
 import json
 import time
 from dataclasses import dataclass
+from typing import cast
 from uuid import uuid4
 
 import httpx
@@ -225,7 +226,7 @@ class AlphaSearchRelay:
                                 else TerminalStatus.FAILED,
                             )
                             result = SearchResponse(status, response_headers, bytes(content))
-                    usage = physical.context.usage
+                    usage = cast(AttemptContext, physical.context).usage
                     return result
         except UpstreamBodyOverflow as exc:
             outcome = Outcome(

@@ -3,6 +3,32 @@
 import asyncio
 import contextlib
 import inspect
+from collections.abc import Coroutine
+from typing import TypedDict, cast
+
+
+class SearchContent(TypedDict, total=False):
+    type: str
+    text: str
+    annotations: list[dict[str, object]]
+
+
+class SearchOutputItem(TypedDict, total=False):
+    id: str
+    type: str
+    name: str
+    content: list[SearchContent]
+
+
+class SearchFunctionCall(SearchOutputItem):
+    call_id: str
+
+
+class CanonicalSearchResponse(TypedDict, total=False):
+    status: str
+    output: list[SearchOutputItem]
+    usage: dict[str, object]
+    incomplete_details: dict[str, object]
 
 
 async def iteration_events(source, stall_ms, *, heartbeat_seconds=1.0):
@@ -26,7 +52,10 @@ async def iteration_events(source, stall_ms, *, heartbeat_seconds=1.0):
     try:
         while True:
             if task is None:
-                task = asyncio.create_task(anext(iterator))
+                # Owned sources are async generators; their asend implements Coroutine.
+                task = asyncio.create_task(
+                    cast(Coroutine[object, None, dict[str, object]], anext(iterator))
+                )
             remaining = deadline - loop.time()
             if remaining <= 0:
                 raise TimeoutError("Routed search model stopped making progress")

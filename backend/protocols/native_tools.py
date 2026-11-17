@@ -3,8 +3,15 @@
 import copy
 import json
 import re
+from collections.abc import Callable
+from typing import Protocol, cast
 
 from .tools import response_tool_identity, response_tools
+
+
+class _JsonStringDecoder(Protocol):
+    # CPython exposes scanstring at runtime, but its private binding is absent from typeshed.
+    scanstring: Callable[[str, int], tuple[str, int]]
 
 
 def custom_item_id(value):
@@ -30,7 +37,7 @@ def input_prefix(arguments):
         return None
     start = match.end()
     try:
-        return json.decoder.scanstring(arguments, start)[0]
+        return cast(_JsonStringDecoder, json.decoder).scanstring(arguments, start)[0]
     except ValueError:
         tail = arguments[start:]
         # A partial JSON escape must not be emitted as raw text or a lone surrogate.

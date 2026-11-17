@@ -13,6 +13,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from threading import RLock
+from typing import cast
 
 from backend.platform.files import instance_lock
 
@@ -172,16 +173,21 @@ class SpendLedger:
         if self.closed:
             raise RuntimeError("Spend ledger owner was released.")
 
+    @property
+    def _connection(self) -> sqlite3.Connection:
+        # Initialization either opens a disk/memory connection or raises.
+        return cast(sqlite3.Connection, self.db)
+
     def _flush(self):
         if self.durable or self.corrupt:
             return self.durable
         try:
             disk = self._connect(self.path)
             try:
-                self.db.backup(disk)
+                self._connection.backup(disk)
             finally:
                 disk.close()
-            memory = self.db
+            memory = self._connection
             self.db = self._connect(self.path)
             memory.close()
             self.durable = True
@@ -196,7 +202,7 @@ class SpendLedger:
         if enforced and (self.corrupt or not self.durable):
             raise SpendDenied("journal-corrupt" if self.corrupt else "reserve-not-durable")
         try:
-            with self.db:
+            with self._connection:
                 return operation(self.db)
         except sqlite3.Error as exc:
             self.persist_failures = min(1_000_000, self.persist_failures + 1)
@@ -206,10 +212,10 @@ class SpendLedger:
             # attempts to flush all debt before any enforced admission can pass.
             if self.durable:
                 memory = self._connect(":memory:")
-                self.db.backup(memory)
-                self.db.close()
+                self._connection.backup(memory)
+                self._connection.close()
                 self.db, self.durable = memory, False
-            with self.db:
+            with self._connection:
                 return operation(self.db)
 
     def _cleanup(self, db, policy, *, force=False):
@@ -427,15 +433,15 @@ class SpendLedger:
                             strict=True,
                         )
                     )
-                    for row in self.db.execute("SELECT * FROM scopes ORDER BY seen DESC")
+                    for row in self._connection.execute("SELECT * FROM scopes ORDER BY seen DESC")
                 ],
-                "sends": self.db.execute("SELECT count(*) FROM sends").fetchone()[0],
+                "sends": self._connection.execute("SELECT count(*) FROM sends").fetchone()[0],
             }
 
     def close(self):
         with self.lock:
             if not self.closed:
                 self._flush()
-                self.db.close()
+                self._connection.close()
                 self.closed = True
                 self._lease.__exit__(None, None, None)

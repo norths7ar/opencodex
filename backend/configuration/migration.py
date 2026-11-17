@@ -7,7 +7,7 @@ from pydantic import JsonValue, ValidationError
 
 from .models import ChannelRequestPolicy, Configuration, CredentialRecord, CustomModel
 
-_OAUTH_SERVICES = {
+_OAUTH_SERVICES: dict[object, tuple[str, str, str]] = {
     "openai": ("https://chatgpt.com/backend-api/codex", "openai-responses", "chatgpt"),
 }
 _RETIRED_OAUTH_IDS = {"anthropic", "kimi", "kimi-responses"}

@@ -71,8 +71,8 @@ class ChannelManagement:
         except ValueError as exc:
             raise ApplicationError(400, str(exc)) from exc
         application = await self.changed()
-        return ChannelDefaultSaved(
-            **self.list().model_dump(exclude_unset=True), saved=True, application=application
+        return ChannelDefaultSaved.model_validate(
+            dict(self.list().model_dump(exclude_unset=True), saved=True, application=application)
         )
 
     def channel(self, name: str) -> Channel:
@@ -278,7 +278,11 @@ class ChannelManagement:
             "ok": ok,
             "latencyMs": round((time.monotonic() - start) * 1000),
             "catalogRefresh": catalog_application(outcome),
-            **({"modelCount": len(snapshot.rows)} if ok else {"error": "Model discovery failed."}),
+            **(
+                {"modelCount": len(snapshot.rows)}
+                if snapshot is not None and ok
+                else {"error": "Model discovery failed."}
+            ),
         }
 
     async def complete(self, name: str, body: dict):
@@ -380,8 +384,10 @@ class ChannelManagement:
             if retired:
                 await self.auth.logout()
         application = await self.changed(refresh=True)
-        return ChannelConfigurationSaved(
-            **self.editor_view(updated).model_dump(exclude_unset=True),
-            saved=True,
-            application=application,
+        return ChannelConfigurationSaved.model_validate(
+            dict(
+                self.editor_view(updated).model_dump(exclude_unset=True),
+                saved=True,
+                application=application,
+            )
         )

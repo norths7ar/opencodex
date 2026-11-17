@@ -3,8 +3,10 @@
 import asyncio
 import copy
 import time
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from hashlib import sha256
+from typing import TYPE_CHECKING, cast
 
 import httpx
 
@@ -20,13 +22,20 @@ from backend.policies.fallback import (
 from backend.policies.pacing import PacingDenied
 from backend.policies.spend_calls import RequestSpend
 from backend.policies.spend_ledger import SpendDenied
+from backend.policies.subagent_fallback import SubagentFallback
 from backend.policies.workflow import WorkflowDenied
 from backend.requests import AttemptReason, Outcome, RequestPurpose, TerminalStatus
 
+from .compaction_dispatch import CompactionResponse
 from .delivery_sse import UpstreamBodyOverflow
+from .execution import GenerationResponse
 from .history import subscription_issuer
 from .routing import native_route, resolve_route
+from .search_delivery import SearchResponse
 from .transport import finish_cleanup, until_cancelled
+
+if TYPE_CHECKING:
+    from .policy_dispatch import ExecutionPolicies
 
 
 class Dispatcher:
@@ -47,9 +56,11 @@ class Dispatcher:
         self.spend_ledger = spend_ledger
         self.client_selector = client_selector
         self.fallback = SimpleFallback(config_loader, self._route_pair)
-        self.subagents = None
-        self.policies = None
-        self.metadata = lambda _channel, _model: None
+        self.subagents: SubagentFallback | None = None
+        self.policies: ExecutionPolicies | None = None
+        self.metadata: Callable[[str, str], dict[str, object] | None] = lambda _channel, _model: (
+            None
+        )
 
     def route(self, selector):
         return resolve_route(self.config_loader(), selector, self.discovered())
@@ -149,7 +160,7 @@ class Dispatcher:
         borrowed_lease=None,
         prepare_body=None,
         resolved_route=None,
-    ):
+    ) -> AsyncIterator[GenerationResponse | CompactionResponse | SearchResponse]:
         """Keep the context open until the returned stream has been consumed."""
         started = time.monotonic()
         original = copy.deepcopy(body)
@@ -251,9 +262,12 @@ class Dispatcher:
                 and self.policies is not None
                 and request.purpose not in {RequestPurpose.PROBE, RequestPurpose.SIZING}
             ):
+                policies = self.policies
 
-                async def prepare_body(body, route, target, context):
-                    await self.policies.prepare(body, route, target, context, incoming, lease)
+                async def prepare_policy_body(body, route, target, context):
+                    await policies.prepare(body, route, target, context, incoming, lease)
+
+                prepare_body = prepare_policy_body
 
             for index, target in enumerate(targets):
                 if request.cancellation.is_set():
@@ -268,12 +282,22 @@ class Dispatcher:
                     )
                 except TargetReplayUnavailable as exc:
                     self.fallback.record(
-                        plan.source, previous, target, trigger, outcome="skipped", reason=str(exc)
+                        plan.source,
+                        previous,
+                        target,
+                        cast(str, trigger),
+                        outcome="skipped",
+                        reason=str(exc),
                     )
                     continue
                 except (ValueError, RuntimeError) as exc:
                     self.fallback.record(
-                        plan.source, previous, target, trigger, outcome="refused", reason=str(exc)
+                        plan.source,
+                        previous,
+                        target,
+                        cast(str, trigger),
+                        outcome="refused",
+                        reason=str(exc),
                     )
                     break
                 route = self.route_native(target.provider, target.model)
@@ -365,7 +389,7 @@ class Dispatcher:
                         plan.source,
                         previous,
                         target,
-                        trigger,
+                        cast(str, trigger),
                         outcome="skipped",
                         reason="The backup cannot prepare this request.",
                     )

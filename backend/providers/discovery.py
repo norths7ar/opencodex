@@ -36,7 +36,7 @@ class ModelDiscovery:
         rows: dict[str, dict] = {}
         cursors: set[str] = set()
         while True:
-            for attempt in range(2):
+            for attempt in (0, 1):
                 response = await client.get(
                     address,
                     params=params,

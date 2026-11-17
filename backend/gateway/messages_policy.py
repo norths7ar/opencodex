@@ -82,8 +82,10 @@ def apply_anthropic_policy(
     )
     enabled = None
     raw = raw_body
-    raw_reasoning = raw.get("reasoning") if isinstance(raw.get("reasoning"), dict) else {}
-    raw_thinking = raw.get("thinking") if isinstance(raw.get("thinking"), dict) else {}
+    reasoning = raw.get("reasoning")
+    raw_reasoning = reasoning if isinstance(reasoning, dict) else {}
+    thinking = raw.get("thinking")
+    raw_thinking = thinking if isinstance(thinking, dict) else {}
     if toggle and caps.get("supportsThinkingToggle") is True and not controls_off:
         if type(raw_reasoning.get("enabled")) is bool:
             enabled = raw_reasoning["enabled"]
@@ -97,8 +99,10 @@ def apply_anthropic_policy(
                 if caps.get("supportsReasoningEffort") is False
                 else None
             )
-            mapped = mapping.get(
-                "max" if toggle_effort == "ultra" else toggle_effort, toggle_effort
+            mapped = (
+                mapping.get("max" if toggle_effort == "ultra" else toggle_effort, toggle_effort)
+                if toggle_effort is not None
+                else None
             )
             if mapped not in {None, "__omit__", "adaptive"}:
                 enabled = mapped not in {"none", "disabled"}
@@ -193,11 +197,13 @@ def apply_anthropic_policy(
             body["tools"] = [
                 t for t in body.get("tools", []) if t.get("name") == choice.get("name")
             ]
-        body["tool_choice"] = {"type": "auto"}
+        automatic_choice: dict[str, object] = {"type": "auto"}
+        body["tool_choice"] = automatic_choice
     if source.get("parallel_tool_calls") is False and body.get("tool_choice", {}).get(
         "type"
     ) not in {None, "none"}:
-        body["tool_choice"]["disable_parallel_tool_use"] = True
+        choice_options: dict[str, object] = body["tool_choice"]
+        choice_options["disable_parallel_tool_use"] = True
     apply_prompt_cache(body, direct=direct, retention=cache_retention)
     return body
 

@@ -10,6 +10,7 @@ import unicodedata
 from collections import deque
 from contextlib import suppress
 from pathlib import Path
+from typing import cast, overload
 
 ENV = {
     "debug": "OCX_DEBUG",
@@ -41,7 +42,15 @@ def redact_text(value, secrets=()):
     return re.sub(r"(https?://)[^/@\s]+:[^/@\s]+@", r"\1[REDACTED]@", text)
 
 
-def _safe(value, secrets=(), depth=0):
+@overload
+def _safe(value: dict[str, object], secrets=()) -> dict[str, object]: ...
+
+
+@overload
+def _safe(value: object, secrets=(), depth: int = 0) -> object: ...
+
+
+def _safe(value, secrets=(), depth=0) -> object:
     if depth > 12:
         return "[truncated]"
     if isinstance(value, dict):
@@ -164,17 +173,18 @@ class DebugState:
 
     def _logging_level(self):
         if self.handler:
+            # install records the integer level before publishing the active handler.
             logging.getLogger("ocx").setLevel(
                 logging.DEBUG
                 if self.enabled("debug") or self.enabled("injection")
-                else self.previous_level
+                else cast(int, self.previous_level)
             )
 
     def close(self):
         if self.handler:
             logger = logging.getLogger("ocx")
             logger.removeHandler(self.handler)
-            logger.setLevel(self.previous_level)
+            logger.setLevel(cast(int, self.previous_level))
             self.handler.close()
             self.handler = None
 
@@ -197,7 +207,7 @@ class DebugState:
     def sample(self, text, *, secrets=()):
         return _truncate(redact_text(text, secrets), SAMPLE_BYTES) if self.enabled("usage") else ""
 
-    def usage(self, record, *, secrets=()):
+    def usage(self, record: dict[str, object], *, secrets=()):
         if not self.enabled("usage"):
             return
         with self.lock:

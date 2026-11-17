@@ -390,6 +390,8 @@ def structured_batch(items):
 
 def format_results(results, structured=False):
     if len(results) <= 1:
-        return single(*results[0], structured) if results else "(no web search ran)"
+        return (
+            single(results[0][0], results[0][1], structured) if results else "(no web search ran)"
+        )
     items = [batch_item(query, outcome) for query, outcome in results]
     return structured_batch(items) if structured else prose_batch(items)

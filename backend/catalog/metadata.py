@@ -42,7 +42,9 @@ def upstream_metadata(row: dict) -> dict:
             del result[field]
             continue
         if (field == "apiCapabilities" and value is None) or (
-            field in {"contextWindow", "maxInputTokens", "maxOutputTokens"} and value <= 0
+            value is not None
+            and field in {"contextWindow", "maxInputTokens", "maxOutputTokens"}
+            and value <= 0
         ):
             del result[field]
     return result

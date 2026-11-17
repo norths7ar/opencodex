@@ -13,8 +13,10 @@ import uuid
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 from ruamel.yaml import YAML
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from ruamel.yaml.emitter import RoundTripEmitter
 from ruamel.yaml.error import CommentMark, YAMLError
 from ruamel.yaml.tokens import CommentToken
@@ -131,7 +133,7 @@ def _container(data, profile, create=False, *, path=None):
     else:
         cursor, parts = data, ("llm-pi-ai", "providers")
     for part in parts:
-        if hasattr(cursor, "yaml_anchor") and cursor.yaml_anchor():
+        if isinstance(cursor, CommentedMap) and cursor.yaml_anchor():
             raise DshError(
                 "DSH provider container uses a YAML anchor; edit it into an independent mapping before applying.",
                 "blocked-container",
@@ -145,7 +147,7 @@ def _container(data, profile, create=False, *, path=None):
         cursor = cursor[part]
         if not isinstance(cursor, dict):
             raise DshError("DSH provider container is not a mapping.", "blocked-container")
-    if hasattr(cursor, "yaml_anchor") and cursor.yaml_anchor():
+    if isinstance(cursor, CommentedMap) and cursor.yaml_anchor():
         raise DshError("DSH provider container uses a YAML anchor.", "blocked-container")
     return cursor
 
@@ -215,7 +217,7 @@ def _edit_fragment(data, profile, source, block):
     comments = _boundary_comments(container, source, remove=block is None)
     if block is None:
         container.pop("opencodex", None)
-        if hasattr(container, "ca"):
+        if isinstance(container, CommentedMap):
             container.ca.items.pop("opencodex", None)
     else:
         container["opencodex"] = copy.deepcopy(block)
@@ -225,18 +227,23 @@ def _edit_fragment(data, profile, source, block):
         # Deletion removes the key from iteration, but ruamel retains its original
         # location. Find the next surviving item at this level or an outer one.
         if isinstance(parent, dict):
-            if key not in (parent.lc.data or {}):
+            # Boundary comments only come from ruamel-loaded nodes, not new plain mappings.
+            mapping = cast(CommentedMap, parent)
+            if key not in (mapping.lc.data or {}):
                 continue
-            line = parent.lc.key(key)[0]
+            line = mapping.lc.key(key)[0]
             siblings = (
                 other
                 for other in parent
-                if other in parent.lc.data and parent.lc.key(other)[0] > line
+                if other in mapping.lc.data and mapping.lc.key(other)[0] > line
             )
         else:
-            siblings = iter(range(key + 1, len(parent)))
+            # Sequence path entries are created with enumerate() in _container.
+            siblings = iter(range(cast(int, key) + 1, len(parent)))
         for next_key in siblings:
-            slots = parent.ca.items.setdefault(next_key, [None, None, None, None])
+            slots = cast(CommentedMap | CommentedSeq, parent).ca.items.setdefault(
+                next_key, [None, None, None, None]
+            )
             slots[1] = comments + (slots[1] or [])
             return []
     return comments
@@ -454,7 +461,9 @@ class DshIntegration:
                 if owned:
                     comments = _edit_fragment(data, profile, source, None)
                     after_owned = None
-                after = _render(data, source, comments) if owned else source
+                    after = _render(data, source, comments)
+                else:
+                    after = source
             else:
                 comments = _edit_fragment(data, profile, source, block)
                 after = _render(data, source, comments)

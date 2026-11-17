@@ -33,14 +33,16 @@ def sanitize_reasoning(
             item.pop("content")
         elif not preserve_plaintext and (isinstance(content, list) and content or envelope):
             item["content"] = []
+        replay_content = item.get("content")
         if require_plaintext and not any(
             isinstance(p, dict)
             and p.get("type") == "reasoning_text"
             and isinstance(p.get("text"), str)
             and p["text"]
-            for p in (item.get("content") if isinstance(item.get("content"), list) else [])
+            for p in (replay_content if isinstance(replay_content, list) else [])
         ):
-            summary = item.get("summary") if isinstance(item.get("summary"), list) else []
+            raw_summary = item.get("summary")
+            summary = raw_summary if isinstance(raw_summary, list) else []
             item["content"] = [
                 {"type": "reasoning_text", "text": p["text"]}
                 for p in summary

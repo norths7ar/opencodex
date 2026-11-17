@@ -300,7 +300,7 @@ def _configured_catalog(home: Path, directory: Path) -> dict | None:
         raise ClientConfigError(current.conflict)
     original = (
         codex_config.parse_document(current.journal["original"])
-        if current.revision is not None
+        if current.revision is not None and current.journal is not None
         else current.document
     )
     configured = original.get("model_catalog_json")

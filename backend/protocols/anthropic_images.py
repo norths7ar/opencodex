@@ -6,10 +6,21 @@ import hashlib
 import io
 import threading
 from collections import OrderedDict
+from typing import TypedDict, cast
 
 import anyio
 from PIL import Image, UnidentifiedImageError
 from pillow_heif import register_heif_opener
+
+
+class _ImageEntry(TypedDict):
+    data: str
+    media: str
+    identity: str | None
+    size: int
+    pos: int
+    dimensions: tuple[int, int]
+
 
 register_heif_opener()
 
@@ -124,7 +135,7 @@ class AnthropicImages:
         refs = image_refs(messages)
         if not refs:
             return
-        entries = [None] * len(refs)
+        entries: list[_ImageEntry | None] = [None] * len(refs)
         snapshots = []
         with self.lock:
             for parts, index in refs:
@@ -188,7 +199,8 @@ class AnthropicImages:
             )
             if index is None:
                 break
-            entry = entries[index]
+            # The index is selected only from nonempty entries above.
+            entry = cast(_ImageEntry, entries[index])
             value = await process(
                 entry["data"], entry["media"], entry["pos"] + 1, entry["identity"]
             )
@@ -221,7 +233,8 @@ class AnthropicImages:
                 continue
             source = block.get("source", {})
             data = source.get("data") if source.get("type") == "base64" else None
-            dimensions = entries[index]["dimensions"] if entries[index] else None
+            current_entry = entries[index]
+            dimensions = current_entry["dimensions"] if current_entry else None
             if dimensions is None and isinstance(data, str) and len(data) <= 64 * MIB:
                 try:
                     # Older-than-processing-window images still participate in the

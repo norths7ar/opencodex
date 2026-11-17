@@ -5,6 +5,7 @@ import json
 import math
 import re
 from pathlib import Path
+from typing import TypedDict, cast
 from uuid import uuid4
 
 import httpx
@@ -53,6 +54,15 @@ def classify(candidates, mapping):
     ]
 
 
+class SizedAnswer(TypedDict):
+    tier: str
+    effort: str
+    domain: str
+    rationale: str
+    move_up_if: str
+    move_down_if: str
+
+
 def parse_answer(text):
     fenced = re.fullmatch(
         r"```(?:json)?[ \t]*\r?\n([\s\S]*?)\r?\n[ \t]*```", text.strip(), re.IGNORECASE
@@ -95,6 +105,8 @@ def proposal(config, answer, classified, *, error=None):
     sized, error = parse_answer(answer)
     if error:
         return {**base, "status": "unsized", "reason": error}
+    # parse_answer returns a value exactly when its error is absent.
+    sized = cast(SizedAnswer, sized)
     choices = [
         row
         for row in classified

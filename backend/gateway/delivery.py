@@ -22,7 +22,7 @@ from .preparation import Inbound, PreparedGeneration, Wire
 
 Terminal = Literal["completed", "incomplete", "failed"]
 MAX_BUFFERED_RESPONSE_BYTES = 16 * 1024 * 1024
-_RESPONSE_TERMINALS = {
+_RESPONSE_TERMINALS: dict[str, Terminal] = {
     "response.completed": "completed",
     "response.incomplete": "incomplete",
     "response.failed": "failed",
@@ -67,7 +67,9 @@ class DeliveryState:
             return
         self.terminal = status
         self.error_code = code
-        self.logical_status = 200 if normal else _LOGICAL_ERRORS.get(code, 502)
+        self.logical_status = (
+            200 if normal else _LOGICAL_ERRORS.get(code, 502) if code is not None else 502
+        )
 
     def _observe_response(self, value: dict, status: Terminal) -> None:
         self.result = value

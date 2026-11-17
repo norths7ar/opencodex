@@ -2,10 +2,28 @@
 
 from collections.abc import Iterable
 from datetime import UTC, datetime
+from typing import NotRequired, TypedDict, cast
 
 from backend.configuration.models import Configuration
 
 from .identity import ModelIdentity
+
+
+class KnownRoster(TypedDict):
+    ids: list[str]
+    removed: NotRequired[list[str]]
+    updatedAt: NotRequired[str]
+
+
+class Arrival(TypedDict):
+    id: str
+    at: str
+
+
+class DiscoveryState(TypedDict, total=False):
+    knownModels: dict[str, KnownRoster]
+    recentArrivals: dict[str, list[Arrival]]
+    newModelPolicy: str
 
 
 def reconcile_discovery(
@@ -58,7 +76,9 @@ def reconcile_discovery(
             config_updates["models"] = config.models.model_copy(update=global_updates)
         return config.model_copy(update=config_updates).model_copy(deep=True)
 
-    discovery = dict(config.models.discovery or {})
+    # This is the discovery shape consumed here, including imported legacy state.
+    # Keep the existing malformed-input behavior rather than adding a new validation pass.
+    discovery = cast(DiscoveryState, dict(config.models.discovery or {}))
     known = dict(discovery.get("knownModels", {}))
     prior = known.get(channel.id)
     timestamp = (observed_at or datetime.now(UTC)).isoformat()
@@ -67,7 +87,10 @@ def reconcile_discovery(
     else:
         active, removed, seen = set(prior["ids"]), set(prior.get("removed", [])), set(discovered)
         arrivals = sorted(seen - active)
-        current = {"ids": discovered, "removed": sorted((removed | (active - seen)) - seen)}
+        current: KnownRoster = {
+            "ids": discovered,
+            "removed": sorted((removed | (active - seen)) - seen),
+        }
         previous = {key: value for key, value in prior.items() if key != "updatedAt"}
         known[channel.id] = {
             **current,
@@ -80,9 +103,10 @@ def reconcile_discovery(
             disable(arrivals)
         if arrivals:
             recent = dict(discovery.get("recentArrivals", {}))
+            new_arrivals: list[Arrival] = [{"id": model, "at": timestamp} for model in arrivals]
             recent[channel.id] = [
                 *recent.get(channel.id, []),
-                *[{"id": model, "at": timestamp} for model in arrivals],
+                *new_arrivals,
             ][-50:]
             discovery["recentArrivals"] = recent
     discovery["knownModels"] = known

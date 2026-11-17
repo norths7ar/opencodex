@@ -5,6 +5,8 @@ avoid a DNS rebinding gap. This module never performs DNS itself.
 """
 
 import ipaddress
+from collections.abc import Awaitable, Callable, Iterable
+from typing import cast
 from urllib.parse import urljoin, urlsplit
 
 _METADATA_HOSTS = {
@@ -118,12 +120,17 @@ def _fake_dns_answer(address, *, allow_benchmark, allow_mihomo):
 
 
 async def validate_destination(
-    url: str, *, allow_private=False, resolver, allow_benchmark=False, allow_mihomo=False
-):
+    url: str,
+    *,
+    allow_private=False,
+    resolver: Callable[[str], Awaitable[Iterable[str]]],
+    allow_benchmark=False,
+    allow_mihomo=False,
+) -> tuple[str, ...]:
     kind = validate_literal(url, allow_private=allow_private)
     if kind not in {"hostname", "localhost"}:
-        return (urlsplit(url).hostname,)
-    host = urlsplit(url).hostname
+        return (cast(str, urlsplit(url).hostname),)
+    host = cast(str, urlsplit(url).hostname)
     addresses = tuple(await resolver(host))
     if not addresses:
         raise DestinationDenied("Destination did not resolve.")

@@ -3,6 +3,7 @@
 import copy
 import json
 import time
+from typing import NotRequired, TypedDict, cast
 
 from .anthropic_reasoning import blocks as thinking_blocks
 from .anthropic_reasoning import chat_usage as anthropic_chat_usage
@@ -12,10 +13,18 @@ from .content import text_content
 from .tools import identifier, response_tool_identity
 
 
+class _AssistantMessage(TypedDict):
+    role: str
+    content: str
+    tool_calls: NotRequired[list[dict[str, object]]]
+    reasoning_content: NotRequired[str]
+    reasoning_details: NotRequired[list[object]]
+
+
 def response_to_chat(data, protocol, *, progress_updates=False, hide_thinking=False):
     if protocol == "chat/completions":
         return data
-    message = {"role": "assistant", "content": ""}
+    message: _AssistantMessage = {"role": "assistant", "content": ""}
     tools, reasoning, reasoning_details = [], "", []
     if protocol == "responses":
         for item in data.get("output", []):
@@ -45,7 +54,7 @@ def response_to_chat(data, protocol, *, progress_updates=False, hide_thinking=Fa
                 reasoning += part["thinking"]
                 reasoning_details.append(
                     {
-                        **thinking_detail(part, len(reasoning_details)),
+                        **cast(dict[str, object], thinking_detail(part, len(reasoning_details))),
                         **({"_progress": True} if progress_updates else {}),
                         **({"_hidden": True} if hide_thinking else {}),
                     }

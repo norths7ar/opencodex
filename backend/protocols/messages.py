@@ -177,13 +177,14 @@ def chat_to_messages(body):
         ]
     if body.get("tool_choice"):
         choice = body["tool_choice"]
-        result["tool_choice"] = (
+        tool_choice: dict[str, str | bool] = (
             {"type": "tool", "name": choice["function"]["name"]}
             if isinstance(choice, dict)
             else {"type": {"required": "any", "auto": "auto", "none": "none"}[choice]}
         )
-        if body.get("parallel_tool_calls") is False and result["tool_choice"]["type"] != "none":
-            result["tool_choice"]["disable_parallel_tool_use"] = True
+        result["tool_choice"] = tool_choice
+        if body.get("parallel_tool_calls") is False and tool_choice["type"] != "none":
+            tool_choice["disable_parallel_tool_use"] = True
     elif result.get("tools") and body.get("parallel_tool_calls") is False:
         result["tool_choice"] = {"type": "auto", "disable_parallel_tool_use": True}
     fmt = body.get("response_format", {})
