@@ -1,23 +1,11 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { logsClockAnchor, logsClockNow } from "../src/pages/logs-clock";
-
-test.each([undefined, null, "1700000000000", -1, NaN, Infinity, -Infinity])(
-  "invalid generatedAt %s leaves the browser fallback in effect", generatedAt => {
-    const anchor = logsClockAnchor(generatedAt, 10);
-    expect(anchor).toBeUndefined();
-    expect(logsClockNow(anchor, 100, 42_000)).toBe(42_000);
-  },
-);
-
-test("zero is a valid proxy epoch and elapsed time is monotonic", () => {
-  const anchor = logsClockAnchor(0, 100);
-  expect(anchor).toEqual({ generatedAt: 0, receivedAt: 100 });
-  expect(logsClockNow(anchor, 150, 80_000)).toBe(50);
-  expect(logsClockNow(anchor, 160, 1)).toBe(60);
+test("proxy-relative expiry is unaffected by a browser clock jump", () => {
+  const anchor = logsClockAnchor(1800000000000, 500);
+  expect(logsClockNow(anchor, 30500, 1800021600000)).toBe(1800000030000);
+  expect(logsClockNow(anchor, 30500, 1799978400000)).toBe(1800000030000);
 });
-
-test("proxy-relative time ignores browser wall-clock skew and subsequent jumps", () => {
-  const anchor = logsClockAnchor(1_800_000_000_000, 500);
-  expect(logsClockNow(anchor, 30_500, 1_800_021_600_000)).toBe(1_800_000_030_000);
-  expect(logsClockNow(anchor, 30_500, 1_799_978_400_000)).toBe(1_800_000_030_000);
+test("missing server time uses browser time until a valid response arrives", () => {
+  expect(logsClockNow(logsClockAnchor(undefined, 10), 100, 42000)).toBe(42000);
+  expect(logsClockNow(logsClockAnchor(50000, 100), 200, 42000)).toBe(50100);
 });

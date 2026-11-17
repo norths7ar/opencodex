@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../.tmp/20261117-frontend-tests.tsbuildinfo",
+    "types": ["vite/client", "node"]
+  },
+  "include": ["tests", "vitest.config.ts"]
+}

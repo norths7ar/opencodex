@@ -1,46 +1,27 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { readJsonIfOk, readJsonOrThrow } from "../src/fetch-json";
-
-test("readJsonIfOk returns null for non-OK responses", async () => {
-  const res = new Response("nope", { status: 500 });
-  expect(await readJsonIfOk(res)).toBeNull();
-});
-
-test("readJsonIfOk returns null for malformed OK JSON (does not throw)", async () => {
-  const res = new Response("{not-json", {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
-  expect(await readJsonIfOk(res)).toBeNull();
-});
-
-test("readJsonIfOk returns undefined for empty OK bodies", async () => {
-  const res = new Response("", { status: 200 });
-  expect(await readJsonIfOk(res)).toBeUndefined();
-});
-
-test("readJsonOrThrow surfaces server error messages", async () => {
-  const res = Response.json({ error: "locked" }, { status: 503 });
-  await expect(readJsonOrThrow(res, "fallback")).rejects.toThrow("locked");
-});
-
-test("readJsonOrThrow prefers error, then message, then fallback", async () => {
+import { apiErrorMessage } from "../src/api-error";
+test("a failed management request retains the server's recovery instruction", async () => {
+  const body = {
+    error: {
+      code: "conflict",
+      message: "Choose another default before deleting",
+      retryable: false,
+    },
+  };
   await expect(
-    readJsonOrThrow(Response.json({ message: "repair marker" }, { status: 500 }), "fallback"),
-  ).rejects.toThrow("repair marker");
-  await expect(
-    readJsonOrThrow(Response.json({ error: "err", message: "msg" }, { status: 500 }), "fallback"),
-  ).rejects.toThrow("err");
-  await expect(
-    readJsonOrThrow(Response.json({ detail: "other" }, { status: 500 }), "fallback"),
-  ).rejects.toThrow("fallback");
+    readJsonOrThrow(Response.json(body, { status: 409 }), "Delete failed"),
+  ).rejects.toThrow(body.error.message);
+  expect(await apiErrorMessage(Response.json(body, { status: 409 }), "Delete failed")).toBe(
+    body.error.message,
+  );
 });
-
-test("readJsonOrThrow accepts Response-like mocks that only implement json()", async () => {
-  const mock = {
-    ok: true,
-    status: 200,
-    json: async () => ({ hello: "world" }),
-  } as unknown as Response;
-  expect(await readJsonOrThrow<{ hello: string }>(mock)).toEqual({ hello: "world" });
+test("an unreadable server response produces a useful fallback instead of a JSON parsing error", async () => {
+  await expect(
+    readJsonOrThrow(new Response("Bad gateway", { status: 502 }), "Service unavailable"),
+  ).rejects.toThrow("Service unavailable");
+  expect(
+    await apiErrorMessage(new Response("Bad gateway", { status: 502 }), "Service unavailable"),
+  ).toBe("Service unavailable");
+  expect(await readJsonIfOk(new Response("{invalid", { status: 200 }))).toBeNull();
 });

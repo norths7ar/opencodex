@@ -4,8 +4,4 @@ dist-runtime/
 build/
 .tmp/
 .deployment-state.json
-tests/
-**/*.test.*
-**/*.spec.*
 pnpm-lock.yaml
-bun.lock

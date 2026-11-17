@@ -1,7 +1,7 @@
 target-version = "py314"
 line-length = 100
 indent-width = 4
-include = ["backend/**/*.py"]
+include = ["backend/**/*.py", "tests/**/*.py"]
 extend-exclude = [".tmp"]
 
 [lint]

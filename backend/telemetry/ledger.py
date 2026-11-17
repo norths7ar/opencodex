@@ -198,10 +198,8 @@ def normalize_usage(raw: dict | None) -> dict | None:
         raw.get("cache_creation_input_tokens"),
         input_details.get("cache_write_tokens") if isinstance(input_details, dict) else None,
     )
-    if all(value is None for value in (input_tokens, output, read, write)):
+    if input_tokens is None or output is None:
         return None
-    input_tokens = input_tokens or 0
-    output = output or 0
     split = raw.get("cache_creation")
     write_1h = first(
         raw.get("cacheCreation1hInputTokens"),

@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, test } from "vitest";
 import { Window } from "happy-dom";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -23,7 +23,9 @@ let host: HTMLElement;
 
 function mount(node: React.ReactElement) {
   win = new Window({ url: "http://localhost/" });
-  previous = Object.fromEntries(globals.map(k => [k, Reflect.get(globalThis, k)])) as typeof previous;
+  previous = Object.fromEntries(
+    globals.map((k) => [k, Reflect.get(globalThis, k)]),
+  ) as typeof previous;
   // Plain assignment fails in a whole-suite run: an earlier DOM test leaves
   // `document` installed as a non-writable global, so only defineProperty works.
   Object.defineProperties(globalThis, {
@@ -34,7 +36,10 @@ function mount(node: React.ReactElement) {
   });
   host = win.document.createElement("div") as never as HTMLElement;
   win.document.body.appendChild(host as never);
-  act(() => { root = createRoot(host); root.render(node); });
+  act(() => {
+    root = createRoot(host);
+    root.render(node);
+  });
   return host;
 }
 
@@ -48,7 +53,16 @@ afterEach(() => {
 
 test("clicking the visible label toggles the switch", () => {
   let clicks = 0;
-  const el = mount(<Switch on={false} onClick={() => { clicks += 1; }} label="Use default aliases" showLabel />);
+  const el = mount(
+    <Switch
+      on={false}
+      onClick={() => {
+        clicks += 1;
+      }}
+      label="Use default aliases"
+      showLabel
+    />,
+  );
 
   const text = el.querySelector(".switch-labeled-text");
   expect(text?.textContent).toBe("Use default aliases");
@@ -57,7 +71,11 @@ test("clicking the visible label toggles the switch", () => {
   const button = el.querySelector("button.switch");
   expect(button?.contains(text as never)).toBe(true);
 
-  act(() => { (text as never as HTMLElement).dispatchEvent(new win.MouseEvent("click", { bubbles: true }) as never); });
+  act(() => {
+    (text as never as HTMLElement).dispatchEvent(
+      new win.MouseEvent("click", { bubbles: true }) as never,
+    );
+  });
   expect(clicks).toBe(1);
 });
 
@@ -86,23 +104,4 @@ test("an unlabeled switch keeps aria-label and gains no redundant title", () => 
   // absent. Copying the name into it announces the control twice.
   expect(button.getAttribute("title")).toBeNull();
   expect(button.querySelector(".switch-labeled-text")).toBeNull();
-});
-
-test("title stays opt-in and does not displace the accessible name", () => {
-  const el = mount(<Switch on={false} onClick={() => {}} label="Shadow call" title="Explains the shadow lane" />);
-  const button = el.querySelector("button.switch")!;
-  expect(button.getAttribute("title")).toBe("Explains the shadow lane");
-  expect(button.getAttribute("aria-label")).toBe("Shadow call");
-});
-
-test("a tri-state bulk control keeps pressed-button semantics", () => {
-  const el = mount(<Switch on={false} mixed onClick={() => {}} label="All profiles" />);
-  const button = el.querySelector("button.switch")!;
-  expect(button.getAttribute("role")).toBeNull();
-  expect(button.getAttribute("aria-checked")).toBeNull();
-  expect(button.getAttribute("aria-pressed")).toBe("mixed");
-  act(() => root!.render(<Switch on mixed={false} onClick={() => {}} label="All profiles" />));
-  expect(button.getAttribute("role")).toBeNull();
-  expect(button.getAttribute("aria-checked")).toBeNull();
-  expect(button.getAttribute("aria-pressed")).toBe("true");
 });

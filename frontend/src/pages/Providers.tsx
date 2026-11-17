@@ -317,7 +317,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
                 </div>
                 {editing ? (
                   <ChannelEditor
-                    key={`${detail.channel.id}:${detail.revision}`}
+                    key={detail.channel.id}
                     apiBase={apiBase}
                     detail={detail}
                     presets={presets.data?.providers ?? []}

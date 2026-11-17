@@ -60,4 +60,32 @@ Usage & Logs 记录请求状态、渠道与模型、耗时和上游报告的 tok
 
 分别运行 `ocx start` 和 `pnpm --dir frontend dev:runtime`。开发网页默认位于 <http://127.0.0.1:5173/>，代理到 10100；若后端使用其他端口，在启动前端前设置 `OPENCODEX_PROXY_TARGET`。`pnpm --dir frontend build:runtime` 只生成 `frontend/build/` 候选产物，不改动正在服务的网页；`pnpm --dir frontend preview` 预览这份候选。正式网页位于 `frontend/dist-runtime/`，通过[更新当前安装](#更新当前安装)流程发布。
 
+### 测试
+
+安装开发依赖后，在仓库根目录运行：
+
+```powershell
+uv sync --locked
+uv run --locked pytest
+pnpm --dir frontend install --frozen-lockfile
+pnpm --dir frontend test
+```
+
+当前正式测试位于后端 `tests` 和前端 `frontend/tests`，也可在根目录运行 `pnpm test` 串联两者。后端异步用例使用已有 AnyIO 提供的 pytest 插件和 asyncio 后端；前端使用 Vitest 与 happy-dom，`pnpm --dir frontend typecheck` 同时检查生产代码和测试。原版中仍适用的界面行为测试已迁入当前入口，依赖已退役实现的测试和旧 Bun 运行器已移除。
+
+测试围绕正常使用、失败和恢复组织：
+
+- 核心调用：渠道配置与持久化、工具调用与多轮续聊、fallback／取消，以及 Codex／DSH 接入同步和恢复。
+- 日常管理：目录刷新与退避、模型覆盖和身份冲突、ChatGPT 登录与刷新、日志用量及费用、存储清理与恢复、服务管理和网页发布回滚。
+- 扩展与首次使用：搜索、视觉辅助、上下文压缩、子代理，以及旧配置激活、导入和脱敏检查。
+- 前端交互：异步请求与切页、刷新失败重试、编辑草稿与版本冲突恢复、会话续期、语言包与页面模块加载失败。
+
+前端测试按当前页面可触发的行为取舍。共享控件保留键盘选择、取消、焦点恢复及防误操作；数据层保留超时恢复、缓存回访和旧响应竞态；额度按 Lite 实际提供的 ChatGPT 窗口验证。旧供应商场景、旧服务器兼容、重复的状态组合及精确 DOM／几何枚举不作为维护目标。
+
+后端用例使用真实业务实现、SQLite 和客户端文件，外部上游通过可控传输替换。每次测试创建仓库根 `.tmp/20261117-lite-workflow-*` 隔离目录并在结束后清理，日常配置和账号不参与测试。共享边界阻止真实网络连接和子进程启动；前端默认阻止未模拟的 HTTP 请求。运行依赖安装命令本身仍可能访问包仓库。
+
+这些是后端 HTTP／领域流程和前端组件测试。服务与发布测试替换操作系统任务、进程和构建边界；账号测试使用模拟授权。因此不代表真实浏览器布局、真实供应商、实际 Codex／DSH 程序、OAuth 或 Windows 计划任务已验收。流式故障用例直接驱动 ASGI 请求与写端，验证交付和清理逻辑，不代替真实 TCP 断连验收。新增用例应围绕实际使用的正常、失败和恢复过程，避免复制历史补丁清单。
+
+独立工具测试使用 `pnpm test:tools`：Codex 排队助手以假 CLI 和隔离目录验证参数、目标选择及失败反馈，不发送真实消息，Windows 默认使用项目基线 PowerShell 7；需要单独验证其他 shell 时可设置 `CODEX_QUEUE_TEST_SHELLS`。隐私扫描测试仅验证既有文本检测函数，不扫描仓库。该扫描器尚未适配 Lite 的全部文件类型和规则，不作为完整隐私检查门槛。
+
 迁移范围与验收状态见 [MIGRATION.md](MIGRATION.md)，模块职责和数据流见[架构文档](docs/lite-architecture.md)。本项目源自 [OpenCodex](https://github.com/lidge-jun/opencodex)，保留原有版权声明，许可证见 [LICENSE](LICENSE)。

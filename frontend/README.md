@@ -14,6 +14,6 @@ From any directory, `ocx service update` synchronizes locked dependencies, build
 
 Use `pnpm lint`, `pnpm typecheck`, and `pnpm format:check`; `pnpm lint:fix` and `pnpm format` apply corrections. Local translation rules cover the app shell, pages, components and feature modules. English defines translation keys; other dictionaries fall back at the shared catalog boundary. New English, Simplified Chinese and Traditional Chinese copy belongs in those dictionaries, not page-local language branches.
 
-Historical tests and test tools remain separate pending the Lite testing work. They are excluded from these production code checks; an old test entry point is not evidence that the current implementation is covered.
+Run `pnpm test` for the Lite suite in `tests`, using Vitest and happy-dom. It covers current component interactions and data behavior with simulated HTTP responses; it does not replace browser layout or live gateway acceptance. Applicable upstream tests have been migrated into this suite, while tests for retired features and the old Bun test tooling have been removed. Lint, formatting and type checks include the current tests.
 
 The [architecture document](../docs/lite-architecture.md) defines component and module responsibilities. Theme values live in `src/design/theme.css`; shared controls own their interaction behavior. Upstream design decisions under `design-system/decisions` are historical records, not current instructions.

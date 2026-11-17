@@ -39,6 +39,8 @@ export function ChannelEditor({
   removing?: boolean;
 }) {
   const c = useChannelCopy();
+  // Keep the draft bound to the version the user opened, even during background refreshes.
+  const [baselineRevision] = useState(detail?.revision);
   const [channel, setChannel] = useState<Channel>(
     () =>
       detail?.channel ?? {
@@ -106,7 +108,7 @@ export function ChannelEditor({
         ...(!headersKeep ? { headers: JSON.parse(headers) } : {}),
       };
       const path = detail
-        ? `/api/channels/${encodeURIComponent(channel.id)}?revision=${detail.revision}`
+        ? `/api/channels/${encodeURIComponent(channel.id)}?revision=${baselineRevision}`
         : "/api/channels";
       const receipt = await fetch(apiBase + path, {
         method: detail ? "PUT" : "POST",

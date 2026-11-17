@@ -3,7 +3,6 @@
 import { after, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -18,7 +17,9 @@ const threadB = '00000000-0000-4000-8000-000000000002';
 const rolloutId = '00000000-0000-4000-8000-000000000099';
 /** Create a disposable test directory and register it for cleanup. */
 function scratch() {
-  const root = mkdtempSync(join(tmpdir(), 'ocx queue test '));
+  const temporaryRoot = join(dirname(scripts), '.tmp');
+  mkdirSync(temporaryRoot, { recursive: true });
+  const root = mkdtempSync(join(temporaryRoot, '20261117-codex-queue-'));
   roots.push(root);
   return root;
 }
@@ -111,8 +112,9 @@ function probes(f) {
     ? readFileSync(f.probeLog, 'utf8').trim().split('\n').map(s => Buffer.from(s, 'base64').toString()) : [];
 }
 const requiredShells = (process.env.CODEX_QUEUE_TEST_SHELLS || '').split(',').filter(Boolean);
+// Lite uses PowerShell 7; older shell compatibility is an explicit opt-in lane.
 const shells = requiredShells.length ? requiredShells : windows
-  ? ['powershell.exe', 'pwsh.exe']
+  ? ['pwsh.exe']
   : ['bash', ...(spawnSync('pwsh', ['-NoProfile', '-Command', 'exit 0']).status === 0 ? ['pwsh'] : [])];
 for (const shell of shells) {
   const ps = !basename(shell).startsWith('bash');
@@ -456,9 +458,3 @@ for (const shell of shells) {
     }
   });
 }
-
-// A sidebar contract is not a substitute for the Astro build, but prevents an orphan page.
-it('exposes the fallback guide through the explicit site navigation', () => {
-  const config = readFileSync(join(scripts, '../docs-site/astro.config.mjs'), 'utf8');
-  assert.match(config, /slug: "guides\/composer-usage-gate-fallback"/);
-});

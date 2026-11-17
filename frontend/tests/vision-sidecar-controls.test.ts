@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import {
   mergeSidecarSetting,
   parsePositiveInteger,
@@ -37,8 +37,14 @@ test("partial merges keep model, backend, reasoning, timeout, and limit", () => 
     ...current,
     maxDescriptionsPerTurn: 3,
   });
-  expect(mergeSidecarSetting(current, { timeoutMs: 12_000 })).toEqual({ ...current, timeoutMs: 12_000 });
-  expect(mergeSidecarSetting(current, { reasoning: "high" })).toEqual({ ...current, reasoning: "high" });
+  expect(mergeSidecarSetting(current, { timeoutMs: 12_000 })).toEqual({
+    ...current,
+    timeoutMs: 12_000,
+  });
+  expect(mergeSidecarSetting(current, { reasoning: "high" })).toEqual({
+    ...current,
+    reasoning: "high",
+  });
   expect(mergeSidecarSetting(current, { streamRoutedModelOutput: true })).toEqual({
     ...current,
     streamRoutedModelOutput: true,

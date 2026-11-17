@@ -16,6 +16,8 @@
     "status": "uv run ocx status",
     "restart": "uv run ocx restart",
     "build:gui": "pnpm --dir frontend build:runtime",
+    "test": "uv run --locked pytest && pnpm --dir frontend test",
+    "test:tools": "node --test scripts/codex-queue.test.mjs scripts/privacy-scan.test.ts",
     "typecheck": "pnpm --dir frontend typecheck",
     "lint": "uv run --locked ruff check && pnpm --dir frontend lint",
     "lint:fix": "uv run --locked ruff check --fix && pnpm --dir frontend lint:fix",

@@ -15,9 +15,6 @@ export default defineConfig([
       "**/dist-runtime/**",
       "**/build/**",
       "**/.tmp/**",
-      "tests/**",
-      "**/*.test.*",
-      "**/*.spec.*",
     ],
   },
   {
@@ -39,6 +36,10 @@ export default defineConfig([
   {
     files: ["*.ts", ".eslint/**/*.ts"],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ["tests/**/*.{ts,tsx}"],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {
     files: ["src/**/*.{ts,tsx}"],

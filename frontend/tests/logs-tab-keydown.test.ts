@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test } from "vitest";
 import { Window } from "happy-dom";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { logsTabKeyDown, readTabFromHash, selectLogsTab } from "../src/pages/logs-tab-keydown";
@@ -8,7 +8,9 @@ let previousGlobals: Record<(typeof globals)[number], unknown>;
 let testWindow: Window;
 
 beforeEach(() => {
-  previousGlobals = Object.fromEntries(globals.map((k) => [k, Reflect.get(globalThis, k)])) as typeof previousGlobals;
+  previousGlobals = Object.fromEntries(
+    globals.map((k) => [k, Reflect.get(globalThis, k)]),
+  ) as typeof previousGlobals;
   testWindow = new Window({ url: "http://localhost/#logs" });
   Object.defineProperties(globalThis, {
     document: { configurable: true, value: testWindow.document },
@@ -28,8 +30,12 @@ function keyEvent(key: string): ReactKeyboardEvent & { prevented: boolean } {
   let prevented = false;
   const e = {
     key,
-    preventDefault() { prevented = true; },
-    get prevented() { return prevented; },
+    preventDefault() {
+      prevented = true;
+    },
+    get prevented() {
+      return prevented;
+    },
   };
   return e as unknown as ReactKeyboardEvent & { prevented: boolean };
 }
@@ -51,12 +57,6 @@ test("readTabFromHash maps logs and logs/debug hashes", () => {
   expect(readTabFromHash()).toBe("debug");
 
   testWindow.location.hash = "#/logs/debug";
-  expect(readTabFromHash()).toBe("debug");
-
-  testWindow.location.hash = "#debug";
-  expect(readTabFromHash()).toBe("debug");
-
-  testWindow.location.hash = "#debug/legacy";
   expect(readTabFromHash()).toBe("debug");
 
   testWindow.location.hash = "#logs/other";

@@ -187,6 +187,7 @@ class Telemetry:
         await self.finalize_request(
             row,
             outcome,
+            attempt_id=attempt_id,
             facts=facts,
             send_count=len(sends),
             settled_sends=sum(item is not None and item.settled for item in sends.values()),
@@ -282,6 +283,7 @@ class Telemetry:
         request_row_id: int | None,
         outcome: Outcome,
         *,
+        attempt_id: str | None = None,
         usage: Usage | None = None,
         duration_ms: float | None = None,
         facts: SendFacts | None = None,
@@ -292,8 +294,17 @@ class Telemetry:
         if request_row_id is None:
             return
         sends = await asyncio.to_thread(lambda: list(self.store.attempts(request_row_id)))
+        # Attribute the caller's result to its selected physical send, not the
+        # last ledger entry (which may belong to an auxiliary request).
+        selected = next((send for send in sends if send["attempt_id"] == attempt_id), {})
+        identity = {
+            key: selected[key]
+            for key in ("provider", "model", "upstream_model", "served_model")
+            if key in selected
+        }
         await self.store.finalize(
             request_row_id,
+            **identity,
             status=outcome.status_code if outcome.status_code is not None else 502,
             usage=usage.values if usage else None,
             usage_status=usage.status.value if usage else "unreported",
