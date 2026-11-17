@@ -2,6 +2,8 @@
 
 OpenCodex Lite 是基于 OpenCodex 2.99.0 的 Windows 本机模型网关。Python 后端提供协议转发和管理 API，React 控制台管理渠道、模型和客户端接入。Service Desk 只负责打开网页，关闭网页不影响网关。
 
+Lite 面向 Windows 单机使用，自动接入客户端为 Codex 和 DSH，ChatGPT 使用单账号。它不提供原版的多账号池轮换、其他客户端专用接入、独立托盘或安装包，也不支持 macOS/Linux 产品运行。控制台中的 Routing 和 Key Limits 仍为待实现入口。
+
 ## 安装与运行
 
 从源码目录运行，使用项目锁定的 Python 3.14.10、Node.js 26.13.1 和 pnpm 12.21.0；uv 需为 0.13.8 或更新版本。使用 PowerShell 7，在仓库根目录执行：
@@ -23,7 +25,7 @@ ocx start
 
 ### 后台服务
 
-使用 `ocx service install` 或首页的“自动后台启动”启用后台运行。它通过当前用户的 Windows 计划任务管理网关，不弹出常驻窗口。用 `ocx service status` 查看状态，`ocx service restart` 重启，`ocx service remove` 停止并移除任务。命令注册和服务安装是两件事：`./scripts/register-cli.ps1 -Remove` 只撤销命令入口。
+使用 `ocx service install` 或首页的“自动后台启动”启用后台运行。它通过当前用户的 Windows 计划任务在登录后启动网关，不弹出常驻窗口；不是登录前运行的系统服务。用 `ocx service status` 查看状态，`ocx service restart` 重启，`ocx service remove` 停止并移除任务。命令注册和服务安装是两件事：`./scripts/register-cli.ps1 -Remove` 只撤销命令入口。
 
 默认运行目录为 `%LOCALAPPDATA%\OpenCodexLite`。用 `--state-dir` 或 `OPENCODEX_LITE_HOME` 可选择独立目录。日常配置以该目录下的 `configuration.sqlite3` 为准；同目录中已有的 Lite `config.json` 只在首次激活时作为迁移来源，之后不再参与配置读取。
 
@@ -31,7 +33,7 @@ ocx start
 
 已有安装若仍使用指向 `ocx.exe` 的旧启动器，先在仓库根目录重新执行一次 `./scripts/register-cli.ps1`。
 
-在任意目录运行 `ocx service update`，更新该命令所注册的源码安装（不自动拉取 Git）。独立运行目录使用 `ocx service update --state-dir <目录>`。命令依次同步锁定依赖、检查类型、构建、校验完整产物、发布网页，并在实例受后台服务管理且正在运行时重启。未运行的实例不会被启动，前台实例需先停止。自动启动偏好和当前端口保持不变。
+在任意目录运行 `ocx service update`，更新该命令所注册的源码安装（不自动拉取 Git）。独立运行目录使用 `ocx service update --state-dir <目录>`。命令依次同步锁定依赖、执行前端生产代码类型检查与构建、校验完整产物、发布网页，并在实例受后台服务管理且正在运行时重启。未运行的实例不会被启动，前台实例需先停止。自动启动偏好和当前端口保持不变。
 
 该流程使用已安装的项目运行时。更换 Python 或更新被运行中进程占用的原生依赖时，先停止服务，在仓库目录的终端中完成 `uv sync --locked`，再更新网页并按需启动服务。
 
@@ -60,18 +62,23 @@ Usage & Logs 记录请求状态、渠道与模型、耗时和上游报告的 tok
 
 分别运行 `ocx start` 和 `pnpm --dir frontend dev:runtime`。开发网页默认位于 <http://127.0.0.1:5173/>，代理到 10100；若后端使用其他端口，在启动前端前设置 `OPENCODEX_PROXY_TARGET`。`pnpm --dir frontend build:runtime` 只生成 `frontend/build/` 候选产物，不改动正在服务的网页；`pnpm --dir frontend preview` 预览这份候选。正式网页位于 `frontend/dist-runtime/`，通过[更新当前安装](#更新当前安装)流程发布。
 
-### 测试
+### 开发检查
 
-`pnpm typecheck` 依次检查 Python 后端和前端 TypeScript；也可单独运行 `uv run --locked pyright`。后端使用开发依赖中固定版本的 Pyright，配置位于 `pyproject.toml`，按 Python 3.14、Windows 和 standard 模式检查整个 `backend/`。Ruff 负责 lint 和格式，pytest 负责运行行为，不能替代类型检查。编辑器使用 Pylance 时选择项目的 `.venv` 解释器。
-
-安装开发依赖后，在仓库根目录运行：
+在仓库根目录安装开发依赖并运行检查：
 
 ```powershell
 uv sync --locked
-uv run --locked pytest
 pnpm --dir frontend install --frozen-lockfile
-pnpm --dir frontend test
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm test
+pnpm test:tools
 ```
+
+`pnpm typecheck` 依次运行后端 Pyright 和前端 TypeScript 检查；Pyright 按 `pyproject.toml` 中的 standard 配置检查 `backend/`，前端同时检查生产代码和测试。Ruff 与 ESLint 负责 lint，Ruff 与 Prettier 负责格式。编辑器使用 Pylance 时选择项目的 `.venv` 解释器。正式更新命令不代替这些完整开发检查。
+
+### 测试
 
 当前正式测试位于后端 `tests` 和前端 `frontend/tests`，也可在根目录运行 `pnpm test` 串联两者。后端异步用例使用已有 AnyIO 提供的 pytest 插件和 asyncio 后端；前端使用 Vitest 与 happy-dom，`pnpm --dir frontend typecheck` 同时检查生产代码和测试。原版中仍适用的界面行为测试已迁入当前入口，依赖已退役实现的测试和旧 Bun 运行器已移除。
 
@@ -90,4 +97,4 @@ pnpm --dir frontend test
 
 独立工具测试使用 `pnpm test:tools`：Codex 排队助手以假 CLI 和隔离目录验证参数、目标选择及失败反馈，不发送真实消息，Windows 默认使用项目基线 PowerShell 7；需要单独验证其他 shell 时可设置 `CODEX_QUEUE_TEST_SHELLS`。隐私扫描测试仅验证既有文本检测函数，不扫描仓库。该扫描器尚未适配 Lite 的全部文件类型和规则，不作为完整隐私检查门槛。
 
-迁移范围与验收状态见 [MIGRATION.md](MIGRATION.md)，模块职责和数据流见[架构文档](docs/lite-architecture.md)。本项目源自 [OpenCodex](https://github.com/lidge-jun/opencodex)，保留原有版权声明，许可证见 [LICENSE](LICENSE)。
+模块职责、数据流和关键设计见[架构文档](docs/lite-architecture.md)。迁移和阶段验收记录保留在 Git 历史中。本项目源自 [OpenCodex](https://github.com/lidge-jun/opencodex)，保留原有版权声明，许可证见 [LICENSE](LICENSE)。
